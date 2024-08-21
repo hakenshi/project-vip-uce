@@ -4,9 +4,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Nav from "@/app/Nav";
 export default function Home() {
   return (
-    <div>
+    <main>
         <Nav/>
       <Aside/>
-    </div>
+    </main>
   );
 }
