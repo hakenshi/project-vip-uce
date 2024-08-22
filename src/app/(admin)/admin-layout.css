@@ -1,0 +1,19 @@
+body{
+    display: grid;
+    grid-template-rows: 100px 2fr;
+    grid-template-columns: 200px;
+    grid-template-areas:
+    "nav nav"
+    "aside main" ;
+    height: 100vh;
+    margin: 0;
+}
+Nav{
+    grid-area: nav;
+}
+Aside{
+    grid-area: aside;
+}
+main {
+    grid-area: main;
+}
