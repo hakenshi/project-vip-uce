@@ -1,37 +1,75 @@
 import db from "./db";
-import {saltAndEncrypt} from "@/app/bcrypt";
+import {saltAndEncrypt} from "../src/bcrypt";
+import {Users} from "@prisma/client";
 
 async function seed() {
 
-    const {prismaClient} = db
+    const adminUserType = db.userType.create({
+        data:{
+            name: "Admin",
+        }
+    })
 
-    const adminUserType = await prismaClient.userType.upsert({
-        where: { name: 'Admin' },
-        update: {},
-        create: {
-            name: 'Admin',
-        },
-    });
-
-    const regularUserType = await prismaClient.userType.upsert({
-        where: { name: 'User' },
-        update: {},
-        create: {
+    const regularUserType = await db.userType.create({
+        data: {
             name: 'User',
         },
     });
 
-    const adminPassword = await saltAndEncrypt("admin");
+    const levels = await db.levels.createMany({
+        data: [
+            {
+                level: "Nível 1",
+            },
+            {
+                level: "Nível 2",
+            },
+            {
+                level: "Nível 3",
+            },
+            {
+                level: "Nível 4",
+            },
+            {
+                level: "Nível 5",
+            },
+            {
+                level: "Nível 6",
+            },
+            {
+                level: "Nível 7",
+            },
+            {
+                level: "Nível 8",
+            },
+            {
+                level: "Nível 9",
+            },
+            {
+                level: "Nível 10",
+            }
+        ]
+    })
 
-    const adminUser = await prismaClient.users.upsert({
-        where: { email: 'admin@example.com' },
-        update: {},
-        create: {
-            email: 'admin@example.com',
-            name: 'Admin User',
+    const classes = await db.classes.createMany({
+        data: [
+            {
+                levelId: 1,
+            }
+        ]
+    })
+
+    const adminPassword = await saltAndEncrypt("admin") as string;
+
+    const adminUser: Users = await db.users.create({
+        data: {
+            email: 'admin@admin.com',
+            name: 'Admin',
             password: adminPassword,
-            userTypeId: adminUserType.id,
-            classId: classA.id,
+            userTypeId: 1,
+            classId: 1,
         },
     });
 }
+
+seed()

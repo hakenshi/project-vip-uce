@@ -22,7 +22,7 @@ const Aside: React.FC<AsideProps> = ({links}) => {
                         ))}
                     </ul>
                     </div>
-                <div className="flex justify-center p-5"><a><FontAwesomeIcon icon={faRightFromBracket} /> Sair</a>
+                <div className="flex justify-center p-5"><FontAwesomeIcon icon={faRightFromBracket} /> Sair
                 </div>
             </aside>
     );

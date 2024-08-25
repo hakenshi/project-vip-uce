@@ -41,7 +41,7 @@ model Activities {
 
 model Users {
   id         Int       @id @default(autoincrement())
-  class      Classes?   @relation(fields: [classId], references: [id])
+  class      Classes?  @relation(fields: [classId], references: [id])
   classId    Int
   userType   UserType  @relation(fields: [userTypeId], references: [id])
   userTypeId Int       @unique
