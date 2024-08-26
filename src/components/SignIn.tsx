@@ -7,7 +7,7 @@ import React, {useRef} from "react";
 import {json} from "node:stream/consumers";
 import {Users} from "@prisma/client";
 import {UserEnum} from "@/enums/user-enum";
-import {useRouter} from "next/navigation";
+import {redirect, useRouter} from "next/navigation";
 
 export default function SignIn() {
 
@@ -36,8 +36,8 @@ export default function SignIn() {
             })
                 .then(({token, user}) => {
                     if (token) {
-                        localStorage.setItem("token", token);
-                        localStorage.setItem("user", JSON.stringify(user));
+                        sessionStorage.setItem("token", token);
+                        sessionStorage.setItem("user", JSON.stringify(user));
                     }
                 })
                 .catch((error) => {
@@ -45,11 +45,11 @@ export default function SignIn() {
                 })
                 .finally(() => {
                     formRef.current?.reset();
-                    const user:Users = JSON.parse(localStorage.getItem("user") as string);
-                    const token = localStorage.getItem("token");
+                    const user:Users = JSON.parse(sessionStorage.getItem("user") as string);
+                    const token = sessionStorage.getItem("token");
                     if (user && token) {
                         if(UserEnum.admin === user.userTypeId){
-                            router.push("/dashboard");
+                            router.replace("/dashboard");
                         }
                     }
                 })

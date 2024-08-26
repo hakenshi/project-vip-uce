@@ -36,9 +36,17 @@ export async function POST(req: NextRequest) {
                 message: "Email ou senha incorretos",
             })
         }
-
         return NextResponse.json({
             token,
-            user
+            user:{
+                id: user.id,
+                name: user.name,
+                classId: user.classId,
+                userTypeId: user.userTypeId,
+                email: user.email,
+                image: user.image,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            }
         })
 }

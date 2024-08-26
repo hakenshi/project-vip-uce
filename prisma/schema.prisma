@@ -40,58 +40,15 @@ model Activities {
 }
 
 model Users {
-  id         Int       @id @default(autoincrement())
-  class      Classes?  @relation(fields: [classId], references: [id])
+  id         Int      @id @default(autoincrement())
+  class      Classes? @relation(fields: [classId], references: [id])
   classId    Int
-  userType   UserType  @relation(fields: [userTypeId], references: [id])
-  userTypeId Int       @unique
+  userType   UserType @relation(fields: [userTypeId], references: [id])
+  userTypeId Int      @unique @default(2)
   email      String
   name       String
   image      String?
   password   String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  Account    Account[]
-  Session    Session[]
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            Int
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       Int
-  expires      DateTime
-  user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@unique([identifier, token])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

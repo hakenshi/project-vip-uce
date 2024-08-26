@@ -1,11 +1,8 @@
 import {FormInput} from "@/components/FormInput";
 import Image from "next/image";
 import logo from "@/images/LOGOVIP.png"
-import {signIn} from "@/auth";
 import SignIn from "@/components/SignIn";
 export default function Home() {
-
-
 
   return (
     <main className="flex justify-center items-center h-screen">
