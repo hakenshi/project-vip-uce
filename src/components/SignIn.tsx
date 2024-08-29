@@ -8,11 +8,13 @@ import {json} from "node:stream/consumers";
 import {Users} from "@prisma/client";
 import {UserEnum} from "@/enums/user-enum";
 import {redirect, useRouter} from "next/navigation";
+import {useStateContext} from "@/components/contexts/useStateContext";
 
 export default function SignIn() {
 
     const formRef = useRef<HTMLFormElement>(null);
     const router = useRouter();
+    const { setUser, setSessionToken,user,token } = useStateContext()
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -29,32 +31,24 @@ export default function SignIn() {
             }).then((response: Response) => {
                 if (!response.ok) {
                     throw new Error(response.statusText);
-                }
-                else {
+                } else {
                     return response.json();
                 }
             })
                 .then(({token, user}) => {
-                    if (token) {
-                        sessionStorage.setItem("token", token);
-                        sessionStorage.setItem("user", JSON.stringify(user));
+                    if (token && user) {
+                        setSessionToken(token)
+                        setUser(user)
+                        sessionStorage.setItem("auth_user", user.id);
+                    }
+                    if (user && user.userTypeId == UserEnum.admin) {
+                        router.replace('/dashboard')
                     }
                 })
                 .catch((error) => {
-                   console.error(error);
-                })
-                .finally(() => {
-                    formRef.current?.reset();
-                    const user:Users = JSON.parse(sessionStorage.getItem("user") as string);
-                    const token = sessionStorage.getItem("token");
-                    if (user && token) {
-                        if(UserEnum.admin === user.userTypeId){
-                            router.replace("/dashboard");
-                        }
-                    }
+                    console.error(error);
                 })
         }
-
     }
 
     return (

@@ -1,19 +1,17 @@
 'use server'
 
 import {NextRequest, NextResponse} from "next/server";
-import {useSearchParams} from "next/navigation";
 import db from "../../../../../prisma/db";
 import * as fs from "fs/promises";
 import path from "node:path";
-import { Users } from "@prisma/client";
+import {saltAndEncrypt} from "@/bcrypt";
 
 export async function PATCH(request: NextRequest, { params }:{params: { id: string }}){
-    const formData = await request.formData();
+    const formData:FormData = await request.formData();
     const image = formData.get('image')
-    const buffer:Buffer = Buffer.from(await image?.arrayBuffer())
-    const fileName = `${image?.name.replaceAll(' ', '_')}`
-
-    const dirPath = path.join(process.cwd(), "/public/images/");
+    const fileName = image ? `${image?.name.replaceAll(' ', '_')}` : null
+    const dirPath = path.join(process.cwd(), "/public/images");
+    let password
 
     try {
         await fs.mkdir(dirPath, {recursive: true});
@@ -23,24 +21,31 @@ export async function PATCH(request: NextRequest, { params }:{params: { id: stri
             }
         })
 
-        if (user.image){
-            const oldFilePath = path.join(dirPath, user.image);
+        if (user.image && image) {
+            const oldFilePath = path.join("/public", user.image);
+            console.log(oldFilePath)
             if(await fs.stat(oldFilePath).catch(() => false)){
                 await fs.unlink(oldFilePath);
             }
         }
 
-        await fs.writeFile(path.join(dirPath, fileName), buffer);
+        if (image && fileName) {
+            await fs.writeFile(path.join(dirPath, fileName), Buffer.from(await image?.arrayBuffer()));
+        }
+
+        if (formData.get('password')){
+            password = await saltAndEncrypt(formData.get('password') as string)
+        }
 
         const userUpdate = await db.users.update({
             where: {
-                id: parseInt(params.id)
+                id: user.id
             },
             data: {
                 email: formData.get('email') as string ?? user.email,
-                name: formData.get('name') as string ?? user.name,
+                name: formData.get('nome') as string ?? user.name,
                 image: `/images/${fileName}` ?? user.image,
-                password: formData.get('password') as string ?? user.password,
+                password: password ?? user.password,
             }
         })
 
@@ -54,6 +59,25 @@ export async function PATCH(request: NextRequest, { params }:{params: { id: stri
         return NextResponse.json({
             "message": err.message,
             "status": 500,
+        })
+    }
+}
+
+export async function GET(request: NextRequest, {params} : {params: {id: string}}) {
+
+    try {
+        const user = await db.users.findFirstOrThrow({
+            where: {
+                id: Number(params.id),
+            }
+        })
+        return NextResponse.json({
+            user: user
+        })
+    }
+    catch (error){
+        return NextResponse.json({
+            error: error,
         })
     }
 }
