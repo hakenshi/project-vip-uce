@@ -20,12 +20,12 @@ export default function AvatarPreview({initialImage, name}: {initialImage: strin
     return(
         <div className={"relative"}>
             <Avatar onClick={() => inputRef.current?.click()} className={"h-40 w-40 cursor-pointer"}>
-                <AvatarImage src={previewImage} alt={"avatar"}/>
+                <AvatarImage className={"object-cover"} src={previewImage} alt={"avatar"}/>
                 <AvatarFallback className={"bg-zinc-700 text-3xl text-white"}>
                     {name?.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
                 <input name={"image"} onChange={handleInputChange} type="file" accept={".jpg, .png, .jpeg"} hidden ref={inputRef}/>
-                <div className={"absolute inset-0 flex items-center justify-center bg-opacity-0 hover:bg-opacity-100 opacity-0 hover:opacity-100 bg-red-600/30 transition-opacity duration-300 z-10"}>
+                <div className={"absolute inset-0 flex items-center justify-center bg-opacity-0 hover:bg-opacity-100 opacity-0 hover:opacity-100 bg-gradient-to-tr from-red-500/50 via-red-600/50 to-red-800/50 transition-opacity duration-300 z-10"}>
                     <FontAwesomeIcon icon={faPencilAlt} className={"text-white text-2xl"}/>
                 </div>
             </Avatar>

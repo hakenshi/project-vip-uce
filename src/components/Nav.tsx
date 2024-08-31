@@ -19,6 +19,8 @@ import {nextSecret} from "@/lib/utils";
 
 const Nav = ({user}: { user: Users }) => {
 
+
+
     const updateUser = async (form: FormData) => {
         'use server'
         if (form.get('senha') != form.get('confirm-senha')) {
@@ -95,7 +97,7 @@ const Nav = ({user}: { user: Users }) => {
             <Dialog>
                 <DialogTrigger>
                     <Avatar>
-                        <AvatarImage src={user?.image} alt={"avatar"}/>
+                        <AvatarImage className={"object-cover"} src={user?.image} alt={"avatar"}/>
                         <AvatarFallback className={"bg-zinc-700 text-white"}>
                             {user?.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
