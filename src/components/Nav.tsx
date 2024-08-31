@@ -1,6 +1,4 @@
-'use client'
-
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
@@ -8,59 +6,87 @@ import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
-import {User} from "next-auth";
-import {useStateContext} from "@/components/contexts/useStateContext";
 import {Users} from "@prisma/client";
+import AvatarPreview from "@/components/AvatarPreview";
+import {saltAndEncrypt} from "@/bcrypt";
+import * as fs from "node:fs";
+import path from "node:path";
+import db from "../../prisma/db";
+import {revalidatePath} from "next/cache";
+import {cookies} from "next/headers";
+import jwt from "jsonwebtoken";
+import {nextSecret} from "@/lib/utils";
 
-const Nav = () => {
+const Nav = ({user}: { user: Users }) => {
 
-    const {user, setUser} = useStateContext()
-
-    const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
-    const fileRef = useRef<HTMLInputElement>(null);
-    const formRef = useRef<HTMLFormElement>(null);
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (fileRef.current) {
-            // @ts-ignore
-            const files = e.target.files[0];
-            setPreviewImage(URL.createObjectURL(files));
-        }
-    }
-
-    const handleSumbit = (e: React.FormEvent) => {
-
-        e.preventDefault()
-
-        if (formRef.current && formRef.current?.senha.value !== formRef.current?.confirmarSenha.value) {
-            alert('as senhas não coincidem')
-            formRef.current.senha.value = ''
-            formRef.current.confirmarSenha.value = ''
+    const updateUser = async (form: FormData) => {
+        'use server'
+        if (form.get('senha') != form.get('confirm-senha')) {
+            alert('As senhas não coincidem.')
             return
         }
-        if (formRef.current) {
-            const formData = new FormData(formRef.current);
 
-            fetch(`/api/user/${user?.id}`, {
-                method: "PATCH",
-                body: formData,
-            })
-                .then((response: Response) => {
-                    if (!response.ok) {
-                        throw new Error(response.statusText);
-                    }
-                    return response.json()
-                })
-                .then((response: {user:Users, status: number}) => {
-                    if (response.status === 201){
-                        setUser(response.user)
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+        const image = form.get('image') as File
+        const imageDir = path.join('public', 'images');
+        let imagePath = user?.image as string;
+
+        if (image) {
+            const newImagePath = `${new Date().toISOString().replace(/:/g, '-')}${path.extname(image.name)}`;
+            const fullImagePath = path.join(imageDir, newImagePath);
+
+            if (user.image) {
+                const oldImagePath = `public/${user.image}`;
+                console.log(oldImagePath)
+
+                if (fs.existsSync(oldImagePath)) {
+                        fs.unlink(oldImagePath, (err: NodeJS.ErrnoException | null) => {
+                        if (err) throw new Error(err.message);
+                        console.log("Imagem antiga apagada com sucesso.");
+                    });
+                }
+            }
+
+            if (!fs.existsSync(imageDir)) {
+                fs.mkdirSync(imageDir, { recursive: true });
+                console.log("Diretório criado com sucesso");
+            }
+
+            fs.writeFile(
+                fullImagePath,
+                Buffer.from(await image.arrayBuffer()),
+                (err: NodeJS.ErrnoException | null) => {
+                    if (err) throw new Error(err.message);
+                    console.log("Imagem salva com sucesso.");
+                }
+            );
+
+            imagePath = `images/${newImagePath}`;
         }
 
+        const password = await saltAndEncrypt(form.get("senha") as string);
+
+
+        const updatedUser = await db.users.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                name: form.get("nome") as string ?? user.name,
+                email: form.get("email") as string ?? user.name,
+                password: password ?? user.password,
+                image: imagePath ?? user.image
+            }
+        })
+
+        const updatedUserToken = jwt.sign(updatedUser, nextSecret, {expiresIn: '24h'});
+
+        cookies().set('token', updatedUserToken)
+
+        revalidatePath('/dashboard')
+
+        return {success: true}
     }
+
     return (
         <nav className="w-full flex justify-between items-center p-7 bg-gradient-to-tr from-red-600 to-red-700">
             <button>
@@ -81,34 +107,29 @@ const Nav = () => {
                             Editar Perfil
                         </DialogTitle>
                     </DialogHeader>
-                    <form ref={formRef} className={"grid grid-rows-4"} onSubmit={handleSumbit}>
+                    <form action={updateUser} className={"grid gap-5"} content="multipart/formdata">
                         <div className={"flex flex-col justify-center items-center"}>
-                            <Avatar onClick={() => fileRef.current?.click()} className={"w-32 h-32 cursor-pointer"}>
-                                <AvatarImage src={previewImage ?? user?.image}/>
-                                <AvatarFallback className={"bg-zinc-700 text-white text-4xl"}>
-                                    {user?.name.substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                                <input onChange={handleImageChange} name='image' hidden type="file" ref={fileRef}
-                                       accept=".jpg, .png, .jpeg"/>
-                            </Avatar>
+                            <AvatarPreview initialImage={user?.image} name={user?.name}/>
                         </div>
-                        <div className="grid gap-1 py-2">
+                        <div className="grid gap-2">
                             <Label htmlFor={"nome"}>Nome</Label>
                             <Input defaultValue={user?.name} name={"nome"} placeholder={"Insira um nome"}/>
                         </div>
-                        <div className="grid gap-1 py-2">
+                        <div className="grid gap-2">
                             <Label htmlFor={"email"}>Email</Label>
                             <Input defaultValue={user?.email} name={"email"} placeholder={"email@email.com"}/>
                         </div>
-                        <div className="grid gap-1 py-2">
+                        <div className="grid gap-2">
                             <Label htmlFor={"senha"}>Senha</Label>
-                            <Input name={"senha"} placeholder={"Insira uma senha"}/>
+                            <Input type={"password"} name={"senha"} placeholder={"Insira uma senha"}/>
                         </div>
-                        <div className="grid gap-1 py-2">
+                        <div className="grid gap-2">
                             <Label htmlFor={"confirm-senha"}>Confirmar Senha</Label>
-                            <Input name={"confirmarSenha"} placeholder={"Confirme sua senha"}/>
+                            <Input type={"password"} name={"confirm-senha"} placeholder={"Confirme sua senha"}/>
                         </div>
-                        <Button type={"submit"}>Salvar</Button>
+                        <div className={"py-2"}>
+                            <Button className={"w-full"} type={"submit"}>Salvar</Button>
+                        </div>
                     </form>
                 </DialogContent>
             </Dialog>

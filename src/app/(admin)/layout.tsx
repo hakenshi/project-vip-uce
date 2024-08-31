@@ -1,42 +1,19 @@
-'use client'
-
-import {ReactNode, useEffect} from "react";
+import {ReactNode} from "react";
 import "./admin-layout.css"
 import Nav from "@/components/Nav";
 import Aside from "@/components/Aside";
-import {faChalkboard, faChartColumn, faChartPie, faUserGroup} from "@fortawesome/free-solid-svg-icons";
-import {useStateContext} from "@/components/contexts/useStateContext";
+import {faChalkboard, faChartColumn, faUserGroup} from "@fortawesome/free-solid-svg-icons";
 import {Users} from "@prisma/client";
+import {auth} from "@/actions/auth";
 
-export default function DashboardLayout({children}: { children: ReactNode }) {
+export default function DashboardLayout({children}: { children: ReactNode; user: Users }) {
 
-    const {user, setUser} = useStateContext();
-    useEffect(() => {
-        const userId = sessionStorage.getItem("auth_user");
-        if (!user) {
-            fetch(`/api/user/${userId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }).then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-            })
-                .then(({user}: {user: Users}) => {
-                    setUser(user);
-                })
-                .catch(e => {
-                    console.log(e);
-                })
-        }
-    }, [user]);
+    const user = auth()
 
     return (
         // @ts-ignore
         <>
-            <Nav/>
+            <Nav user={user}/>
             <Aside links={[{link: '/dashboard', label: 'Dashboard', icon: faChartColumn}, {
                 link: '/alunos',
                 label: 'Alunos',

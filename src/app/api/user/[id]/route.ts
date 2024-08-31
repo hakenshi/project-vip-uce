@@ -11,7 +11,6 @@ export async function PATCH(request: NextRequest, { params }:{params: { id: stri
     const image = formData.get('image')
     const fileName = image ? `${image?.name.replaceAll(' ', '_')}` : null
     const dirPath = path.join(process.cwd(), "/public/images");
-    let password
 
     try {
         await fs.mkdir(dirPath, {recursive: true});

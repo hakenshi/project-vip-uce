@@ -12,9 +12,7 @@ import {useStateContext} from "@/components/contexts/useStateContext";
 
 export default function SignIn() {
 
-    const formRef = useRef<HTMLFormElement>(null);
     const router = useRouter();
-    const { setUser, setSessionToken,user,token } = useStateContext()
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -52,16 +50,6 @@ export default function SignIn() {
     }
 
     return (
-        <form className="p-5 w-full flex flex-col gap-5" ref={formRef} onSubmit={handleSubmit}>
-            <div className="flex w-full justify-center">
-                <Image className={"w-32"} width={114} src={logo} alt={"logo vip english"}/>
-            </div>
-            <FormInput name={"email"} label={"Email"} placeholder={"email@gmail.com"}/>
-            <FormInput type={'password'} name={"senha"} label={"Senha"} placeholder={"•••••••"}/>
-            <div className="flex justify-center">
-                <button className="bg-red-600 hover:bg-red-700 p-2 text-white rounded w-44" type={"submit"}>Enviar
-                </button>
-            </div>
-        </form>
+
     )
 }

@@ -10,7 +10,6 @@ import * as crypto from "node:crypto";
 
 export async function POST(req: NextRequest) {
 
-    const nextSecret = crypto.randomBytes(64).toString("base64");
 
     const {email, password} = await req.json();
 
