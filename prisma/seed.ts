@@ -4,7 +4,7 @@ import {Users} from "@prisma/client";
 
 async function seed() {
 
-    const adminUserType = db.userType.create({
+    const adminUserType = await db.userType.create({
         data:{
             name: "Admin",
         }
@@ -70,6 +70,20 @@ async function seed() {
             classId: 1,
         },
     });
+
+    const userPassword = await saltAndEncrypt("123") as string;
+
+    const aluno:Users = await db.users.create({
+        data:{
+            email: 'jorge@email.com',
+            name: 'Jorge',
+            password: userPassword,
+            userTypeId: 2,
+            classId: 1
+        }
+    })
+
+    console.log("finished seedin")
 }
 
 seed()

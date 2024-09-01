@@ -11,7 +11,6 @@ export default function DashboardLayout({children}: { children: ReactNode; user:
     const user = auth()
 
     return (
-        // @ts-ignore
         <>
             <Nav user={user}/>
             <Aside links={[{link: '/dashboard', label: 'Dashboard', icon: faChartColumn}, {

@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 import {NextRequest, NextResponse} from "next/server";
-import * as crypto from "node:crypto";
+import {nextSecret} from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
 

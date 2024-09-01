@@ -20,20 +20,6 @@ CREATE TABLE "UserType" (
 );
 
 -- CreateTable
-CREATE TABLE "Users" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "classId" INTEGER NOT NULL,
-    "userTypeId" INTEGER NOT NULL,
-    "email" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "Users_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Classes" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Users_userTypeId_fkey" FOREIGN KEY ("userTypeId") REFERENCES "UserType" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
--- CreateTable
 CREATE TABLE "Activities" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "title" TEXT NOT NULL,
@@ -42,8 +28,20 @@ CREATE TABLE "Activities" (
     "updated_at" DATETIME NOT NULL
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Classes_levelId_key" ON "Classes"("levelId");
+-- CreateTable
+CREATE TABLE "Users" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "classId" INTEGER,
+    "userTypeId" INTEGER NOT NULL DEFAULT 2,
+    "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "image" TEXT,
+    "password" TEXT NOT NULL,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL,
+    CONSTRAINT "Users_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Classes" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Users_userTypeId_fkey" FOREIGN KEY ("userTypeId") REFERENCES "UserType" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Users_userTypeId_key" ON "Users"("userTypeId");
+CREATE UNIQUE INDEX "Classes_levelId_key" ON "Classes"("levelId");

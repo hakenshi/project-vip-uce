@@ -16,10 +16,9 @@ import {revalidatePath} from "next/cache";
 import {cookies} from "next/headers";
 import jwt from "jsonwebtoken";
 import {nextSecret} from "@/lib/utils";
+import {updateStoreImage} from "@/lib/images";
 
 const Nav = ({user}: { user: Users }) => {
-
-
 
     const updateUser = async (form: FormData) => {
         'use server'
@@ -27,45 +26,12 @@ const Nav = ({user}: { user: Users }) => {
             alert('As senhas não coincidem.')
             return
         }
+        const imagePath = await updateStoreImage(form, user.image)
 
-        const image = form.get('image') as File
-        const imageDir = path.join('public', 'images');
-        let imagePath = user?.image as string;
-
-        if (image) {
-            const newImagePath = `${new Date().toISOString().replace(/:/g, '-')}${path.extname(image.name)}`;
-            const fullImagePath = path.join(imageDir, newImagePath);
-
-            if (user.image) {
-                const oldImagePath = `public/${user.image}`;
-                console.log(oldImagePath)
-
-                if (fs.existsSync(oldImagePath)) {
-                        fs.unlink(oldImagePath, (err: NodeJS.ErrnoException | null) => {
-                        if (err) throw new Error(err.message);
-                        console.log("Imagem antiga apagada com sucesso.");
-                    });
-                }
-            }
-
-            if (!fs.existsSync(imageDir)) {
-                fs.mkdirSync(imageDir, { recursive: true });
-                console.log("Diretório criado com sucesso");
-            }
-
-            fs.writeFile(
-                fullImagePath,
-                Buffer.from(await image.arrayBuffer()),
-                (err: NodeJS.ErrnoException | null) => {
-                    if (err) throw new Error(err.message);
-                    console.log("Imagem salva com sucesso.");
-                }
-            );
-
-            imagePath = `images/${newImagePath}`;
+        let password
+        if (form.get('senha')){
+            password = await saltAndEncrypt(form.get("senha") as string);
         }
-
-        const password = await saltAndEncrypt(form.get("senha") as string);
 
 
         const updatedUser = await db.users.update({
@@ -97,7 +63,7 @@ const Nav = ({user}: { user: Users }) => {
             <Dialog>
                 <DialogTrigger>
                     <Avatar>
-                        <AvatarImage className={"object-cover"} src={user?.image} alt={"avatar"}/>
+                        <AvatarImage className={"object-cover"} src={user?.image as string} alt={"avatar"}/>
                         <AvatarFallback className={"bg-zinc-700 text-white"}>
                             {user?.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>

@@ -26,9 +26,9 @@ model Classes {
 }
 
 model UserType {
-  id   Int    @id @default(autoincrement())
+  id   Int     @id @default(autoincrement())
   name String
-  user Users?
+  user Users[]
 }
 
 model Activities {
@@ -42,10 +42,10 @@ model Activities {
 model Users {
   id         Int      @id @default(autoincrement())
   class      Classes? @relation(fields: [classId], references: [id])
-  classId    Int
+  classId    Int?
   userType   UserType @relation(fields: [userTypeId], references: [id])
-  userTypeId Int      @unique @default(2)
-  email      String
+  userTypeId Int      @default(2)
+  email      String   @unique
   name       String
   image      String?
   password   String

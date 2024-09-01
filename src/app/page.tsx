@@ -1,7 +1,6 @@
 import {FormInput} from "@/components/FormInput";
 import Image from "next/image";
 import logo from "@/images/LOGOVIP.png"
-import SignIn from "@/components/SignIn";
 import React from "react";
 import db from "../../prisma/db";
 import bcrypt from "bcrypt";
@@ -21,7 +20,7 @@ export default function Home() {
             }
         })
 
-        const password = bcrypt.compare(form.get("senha"), user.password);
+        const password = await bcrypt.compare(form.get("senha") as string, user.password);
 
         if (password && user){
             const token = jwt.sign(user, nextSecret, {expiresIn: '24h'});
@@ -34,16 +33,13 @@ export default function Home() {
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: 'strict',
                 })
-                cookies().set('user', JSON.stringify(user), {
-                    httpOnly: true,
-                    maxAge: 24 * 60 * 60,
-                    path: '/',
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
-                })
+
                 revalidatePath('/')
                 redirect('/dashboard')
             }
+        }
+        else {
+            console.log('email ou senha incorretos')
         }
     }
 

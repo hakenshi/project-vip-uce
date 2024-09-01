@@ -7,6 +7,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 import {redirect} from "next/navigation";
 import {cn} from "@/lib/utils"
 import {ContextProvider} from "@/components/contexts/useStateContext";
+import {Toaster} from "@/components/ui/toaster";
 
 config.autoAddCss = false;
 
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn("min-h-screen bg-background font-sans antialiased")}>
             {children}
+      <Toaster />
       </body>
     </html>
   );
