@@ -13,10 +13,20 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
+import {DataTable} from "@/app/(admin)/turmas/DataTable";
+import {columns} from "@/app/(admin)/turmas/columns";
 
 export default async function AdminPage() {
 
-    const classes = await db.classes.findMany()
+    const classes = await db.classes.findMany({
+        select:{
+            id: true,
+            levelId: true,
+            users:true
+        }
+    })
+
+
 
     return (
         <main className="text-center p-5 container space-y-5">
@@ -32,12 +42,12 @@ export default async function AdminPage() {
                 </DialogContent>
             </Dialog>
 
-            {classes.map(classes => (
-                <Card
+            {classes.map((classes, index) => (
+                <Card key={classes.id}
                     className={"flex flex-col justify-between gap-2 w-full max-w-96 min-h-56 bg-white rounded shadow-md"}>
                     <CardTitle className="p-4 w-full flex flex-col items-center justify-center">
                         <Image width={80} height={80} src={"/LOGOVIP.png"} alt={""}/>
-                        <p className="text-sm text-center my-5 font-normal">Nível {classes.id}</p>
+                        <p className="text-sm text-center my-5 font-normal">Nível {classes.levelId}</p>
                     </CardTitle>
                     <CardFooter className={"border-t flex justify-between items-center p-0"}>
                         <div className="p-2">
@@ -45,10 +55,11 @@ export default async function AdminPage() {
                                 <DialogTrigger className={"hover:bg-zinc-200 rounded-full"}>
                                     <FontAwesomeIcon icon={faUserGroup} className="p-2"/>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className={"max-w-screen-lg"}>
                                     <DialogHeader>
-                                        <DialogTitle>Alunos na Turma</DialogTitle>
+                                        <DialogTitle className={"text-center"}>Alunos na Turma</DialogTitle>
                                     </DialogHeader>
+                                    <DataTable columns={columns} data={classes.users} />
                                 </DialogContent>
                             </Dialog>
                         </div>
