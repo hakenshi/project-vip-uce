@@ -29,17 +29,17 @@ const Aside: React.FC<AsideProps> = ({links}) => {
     return (
         <aside className="flex md:flex-col items-center justify-center text-white bg-zinc-600">
             <div className="flex md:flex-col justify-center gap-9 flex-grow">
-                <ul className="flex md:flex-col w-full justify-around md:justify-center gap-5">
+                <ul className="flex md:flex-col w-full justify-evenly md:justify-center gap-5">
                     {links?.map(({link, label, icon}, index) => (
-                        <li className={"text-lg"} key={index}><Link href={link}><FontAwesomeIcon icon={icon}/> <span
-                            className={"hidden md:inline"}>{label}</span> </Link></li>
+                        <li className={"text-lg text-center md:text-left"} key={index}><Link href={link}><FontAwesomeIcon icon={icon}/> <span
+                            className={"md:text-lg text-xs block md:inline"}>{label}</span> </Link></li>
                     ))}
                 </ul>
             </div>
-            <button onClick={() => logout()} className="flex justify-center items-center p-5 gap-5 text-lg">
-                <FontAwesomeIcon icon={faRightFromBracket}/>
-                <span className={"hidden md:inline"}>Sair</span>
-            </button>
+            {/*<button onClick={() => logout()} className="flex justify-center items-center p-5 gap-5 text-lg">*/}
+            {/*    <FontAwesomeIcon icon={faRightFromBracket}/>*/}
+            {/*    <span className={"hidden md:inline"}>Sair</span>*/}
+            {/*</button>*/}
         </aside>
     );
 };

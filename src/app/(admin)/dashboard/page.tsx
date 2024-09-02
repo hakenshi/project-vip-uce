@@ -24,7 +24,7 @@ export default async function AdminPage() {
     return (
             <main className="text-center flex flex-col gap-5 container p-5">
                 <div className="flex flex-col items-center md:gap-0 gap-5  md:flex-row justify-around">
-                    <Card className={"w-64 h-64 text-center"}>
+                    <Card className={"w-48 h-48 md:w-64 md:h-64 text-center"}>
                         <CardHeader>
                             <CardTitle>Alunos</CardTitle>
                             <CardDescription>Quantidade de Alunos Cadastrados</CardDescription>
@@ -36,7 +36,7 @@ export default async function AdminPage() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className={"w-64 h-64 text-center"}>
+                    <Card className={"w-48 h-48 md:w-64 md:h-64 text-center"}>
                         <CardHeader>
                             <CardTitle>Turmas</CardTitle>
                             <CardDescription>Quantidade de Turmas Cadastradas</CardDescription>
@@ -48,7 +48,7 @@ export default async function AdminPage() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className={"w-64 h-64 text-center"}>
+                    <Card className={"w-48 h-48 md:w-64 md:h-64 text-center"}>
                         <CardHeader>
                             <CardTitle>Níveis</CardTitle>
                             <CardDescription>Quantidade de Níveis Cadastrados</CardDescription>
@@ -60,7 +60,7 @@ export default async function AdminPage() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className={"w-64 h-64 text-center"}>
+                    <Card className={"w-48 h-48 md:w-64 md:h-64 text-center"}>
                         <CardHeader>
                             <CardTitle>Atividades</CardTitle>
                             <CardDescription>Quantidade de Atividades Postadas</CardDescription>

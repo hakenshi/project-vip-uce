@@ -1,6 +1,6 @@
 import {FormInput} from "@/components/FormInput";
 import Image from "next/image";
-import logo from "@/images/LOGOVIP.png"
+import logo from "../../public/LOGOVIP.png"
 import React from "react";
 import db from "../../prisma/db";
 import bcrypt from "bcrypt";
