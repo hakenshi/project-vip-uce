@@ -16,6 +16,9 @@ import AvatarPreview from "@/components/AvatarPreview";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import CadastrarAluno from "@/components/CadastrarAluno";
+import {ChevronLeft, ChevronRight} from "lucide-react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
 
 interface DataTableProps<TData, TValue> {
     columns: Column<TData, TValue>[];
@@ -35,7 +38,7 @@ export function DataTable<TData, TValue> ({columns, data}: DataTableProps<TData,
 
     return (
         <div className="container mx-auto py-2 border rounded overflow-x-auto">
-            <div className="flex justify-evenly p-5 items-center">
+            <div className="flex md:justify-evenly p-5 items-center">
                 <div>
                     <Input
                         placeholder={"Insira um nome..."}
@@ -84,6 +87,18 @@ export function DataTable<TData, TValue> ({columns, data}: DataTableProps<TData,
                     )}
                 </TableBody>
             </Table>
+            <div className="flex justify-end md:justify-center">
+                <Button onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                        variant={"ghost"}>
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                </Button>
+                <Button  onClick={() => table.nextPage()}
+                         disabled={!table.getCanNextPage()}
+                         variant={"ghost"}>
+                    <FontAwesomeIcon icon={faChevronRight} />
+                </Button>
+            </div>
         </div>
     )
 }

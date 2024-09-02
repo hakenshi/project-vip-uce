@@ -112,8 +112,7 @@ export async function deleteUser(email: string){
     })
 
     if (response.ok){
+        revalidatePath('/alunos')
         return response.json()
     }
-
-    revalidatePath('/alunos')
 }

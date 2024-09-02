@@ -40,15 +40,16 @@ model Activities {
 }
 
 model Users {
-  id         Int      @id @default(autoincrement())
-  class      Classes? @relation(fields: [classId], references: [id])
+  id         Int       @id @default(autoincrement())
+  class      Classes?  @relation(fields: [classId], references: [id])
   classId    Int?
-  userType   UserType @relation(fields: [userTypeId], references: [id])
-  userTypeId Int      @default(2)
-  email      String   @unique
+  userType   UserType  @relation(fields: [userTypeId], references: [id])
+  userTypeId Int       @default(2)
+  email      String    @unique
   name       String
   image      String?
   password   String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  birthDay   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }

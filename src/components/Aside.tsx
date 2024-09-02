@@ -8,11 +8,12 @@ import {faRightFromBracket, IconDefinition} from "@fortawesome/free-solid-svg-ic
 import {redirect, useRouter} from "next/navigation";
 import {router} from "next/client";
 
-interface Link{
+interface Link {
     link: string;
     label: string;
     icon: IconDefinition;
 }
+
 interface AsideProps {
     links: Link[];
 }
@@ -20,22 +21,26 @@ interface AsideProps {
 const Aside: React.FC<AsideProps> = ({links}) => {
 
     const router = useRouter();
-    const logout = () =>{
+    const logout = () => {
         sessionStorage.clear();
         router.replace('/')
     }
 
     return (
-            <aside className="flex flex-col items-center justify-center text-white bg-zinc-600">
-                    <div className="flex flex-col justify-center gap-9 flex-grow">
-                    <ul className="flex flex-col justify-center gap-5">
-                        {links?.map(({link, label, icon}, index) => (
-                            <li className={"text-lg"} key={index}><Link href={link} ><FontAwesomeIcon icon={icon} /> {label} </Link></li>
-                        ))}
-                    </ul>
-                    </div>
-                <button onClick={() => logout()} className="flex justify-center items-center p-5 gap-5 text-lg"><FontAwesomeIcon icon={faRightFromBracket} /> Sair</button>
-            </aside>
+        <aside className="flex md:flex-col items-center justify-center text-white bg-zinc-600">
+            <div className="flex md:flex-col justify-center gap-9 flex-grow">
+                <ul className="flex md:flex-col w-full justify-around md:justify-center gap-5">
+                    {links?.map(({link, label, icon}, index) => (
+                        <li className={"text-lg"} key={index}><Link href={link}><FontAwesomeIcon icon={icon}/> <span
+                            className={"hidden md:inline"}>{label}</span> </Link></li>
+                    ))}
+                </ul>
+            </div>
+            <button onClick={() => logout()} className="flex justify-center items-center p-5 gap-5 text-lg">
+                <FontAwesomeIcon icon={faRightFromBracket}/>
+                <span className={"hidden md:inline"}>Sair</span>
+            </button>
+        </aside>
     );
 };
 

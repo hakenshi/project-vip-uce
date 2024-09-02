@@ -4,7 +4,7 @@ import {ColumnDef} from "@tanstack/table-core";
 import {Users} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
-import {faArrows, faArrowsUpDown, faCommentDots, faEllipsis, faSort} from "@fortawesome/free-solid-svg-icons";
+import {faArrowsUpDown, faEllipsis} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     DropdownMenu,
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import EditarAluno from "@/components/EditarAluno";
 import {deleteUser} from "@/actions/user-crud";
+import {useToast} from "@/hooks/use-toast";
 
 export const columns: ColumnDef<Users>[] = [
     {
@@ -67,7 +68,6 @@ export const columns: ColumnDef<Users>[] = [
             const user = row.original
             return Intl.DateTimeFormat('pt-br', {
                 dateStyle: "short",
-                timeStyle: "short",
             }).format(user.created_at)
         },
         sortingFn: 'datetime'
@@ -83,12 +83,34 @@ export const columns: ColumnDef<Users>[] = [
             const [isEditing, setIsEditing] = useState(false)
             const [isAlertOpen, setIsAlertOpen] = useState(false)
 
+            const {toast} = useToast()
+
             return(
                 <>
-
-                    <Dialog open={isOpen} onOpenChange={() => setIsOpen(false)}>
+                    <Dialog  open={isOpen} onOpenChange={() => setIsOpen(false)}>
                         <DialogContent>
-                            Ver Aluno
+                            <DialogHeader>
+                                <DialogTitle>Ver Aluno</DialogTitle>
+                            </DialogHeader>
+                            <div className={"flex items-center justify-between"}>
+                                   <div>
+                                       <Avatar className={"w-60 h-60"}>
+                                           <AvatarImage className={"object-cover"} src={`${user.image}`} />
+                                           <AvatarFallback className={"text-3xl"}>
+                                               {user?.name.substring(0, 2).toUpperCase()}
+                                           </AvatarFallback>
+                                       </Avatar>
+                                   </div>
+                                <div>
+                                    <div>
+                                        <p className={"truncate"}><strong>Nome:</strong> {user.name}</p>
+                                        <p className={"truncate"}><strong>Email: </strong>{user.email}</p>
+                                        <p className={"truncate"}><strong>Tipo de usuário:</strong> {user.userTypeId}</p>
+                                        <p className={"truncate"}><strong>Turma:</strong></p>
+                                        <p className={"truncate"}><strong>Data de adição:</strong> {new Date(user.created_at).toLocaleDateString('pt-br')}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </DialogContent>
                     </Dialog>
 
@@ -111,7 +133,10 @@ export const columns: ColumnDef<Users>[] = [
                             <AlertDialogFooter>
                                 <AlertDialogAction onClick={async () => {
                                    const response = await deleteUser(user.email)
-                                    console.log(response)
+                                    toast({
+                                        variant: "default",
+                                        description: response.message,
+                                    })
                                 }} >Sim</AlertDialogAction>
                                 <AlertDialogCancel>Não</AlertDialogCancel>
                             </AlertDialogFooter>
@@ -119,10 +144,10 @@ export const columns: ColumnDef<Users>[] = [
                     </AlertDialog>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button>
+                            <Button variant={"ghost"} size={"icon"}>
                                 <span className={"sr-only"}>Opções</span>
                                 <FontAwesomeIcon icon={faEllipsis} />
-                            </button>
+                            </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
@@ -141,7 +166,6 @@ export const columns: ColumnDef<Users>[] = [
                                 Copiar Nome
                             </DropdownMenuItem>
                         </DropdownMenuContent>
-
                     </DropdownMenu>
                 </>
             )

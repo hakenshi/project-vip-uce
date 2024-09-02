@@ -6,11 +6,11 @@ import db from "../../prisma/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
-import {useStateContext} from "@/components/contexts/useStateContext";
 import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
 import {cookies} from "next/headers";
 import {nextSecret} from "@/lib/utils";
+import {UserEnum} from "@/enums/user-enum";
 export default function Home() {
     const login = async (form: FormData) => {
         'use server'
@@ -34,8 +34,14 @@ export default function Home() {
                     sameSite: 'strict',
                 })
 
-                revalidatePath('/')
-                redirect('/dashboard')
+                if (user.userTypeId === UserEnum.admin){
+                    revalidatePath('/')
+                    redirect('/dashboard')
+                }
+                else{
+                    revalidatePath('/')
+                    redirect('/turma')
+                }
             }
         }
         else {

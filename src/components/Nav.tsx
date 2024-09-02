@@ -56,8 +56,8 @@ const Nav = ({user}: { user: Users }) => {
     }
 
     return (
-        <nav className="w-full flex justify-between items-center p-7 bg-gradient-to-tr from-red-600 to-red-700">
-            <button>
+        <nav className="w-full flex justify-end md:justify-between items-center p-7 bg-gradient-to-tr from-red-600 to-red-700">
+            <button className={"hidden md:block"}>
                 <FontAwesomeIcon icon={faBars} className={"text-white text-2xl"}/>
             </button>
             <Dialog>
