@@ -11,3 +11,14 @@ export async function GET(request: NextRequest) {
         classes:classes
     })
 }
+
+export async function POST(request: NextRequest) {
+
+    const {users} = await request.json();
+
+
+
+    return NextResponse.json({
+        "message": "debugging"
+    })
+}

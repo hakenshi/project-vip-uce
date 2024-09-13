@@ -5,6 +5,7 @@ import db from "../../prisma/db";
 import {revalidatePath} from "next/cache";
 import {saltAndEncrypt} from "@/bcrypt";
 import {storeImage, updateStoreImage} from "@/lib/images";
+import { cookies } from "next/headers";
 
 export const createUser = async (form: FormData) => {
 
@@ -107,12 +108,16 @@ export async function updateUser(form: FormData) {
 
 export async function deleteUser(email: string){
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API}user/${email}`,{
-        method: "DELETE"
-    })
+    const token = cookies().get('token')
 
-    if (response.ok){
-        revalidatePath('/alunos')
-        return response.json()
+    if(token){
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}user/${email}`,{
+            method: "DELETE"
+        })
+    
+        if (response.ok){
+            revalidatePath('/alunos')
+            return response.json()
+        }
     }
 }

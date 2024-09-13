@@ -27,10 +27,30 @@ import {deleteUser} from "@/actions/user-crud";
 import {useToast} from "@/hooks/use-toast";
 import {Select} from "@/components/ui/select";
 import SelectTurmas from "@/components/SelectTurmas";
-
+import {Checkbox} from "@/components/ui/checkbox";
 
 
 export const columns: ColumnDef<Users>[] = [
+    {
+        accessorKey: "select",
+        header: ({table}) => (
+            <Checkbox
+                //     checked={
+                //         table.getIsAllColumnsVisible() ||
+                //         (table.getIsAllRowsSelected() && "indeterminate")
+                // }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            />
+        ),
+        cell: ({row}) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
     {
         accessorKey: 'image',
         header: 'Foto',
@@ -41,7 +61,7 @@ export const columns: ColumnDef<Users>[] = [
             return (
                 <div className={"w-full flex justify-center"}>
                     <Avatar>
-                        <AvatarImage className={"object-cover"} src={`${user.image}`} />
+                        <AvatarImage className={"object-cover"} src={`${user.image}`}/>
                         <AvatarFallback>
                             {user?.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
@@ -61,10 +81,10 @@ export const columns: ColumnDef<Users>[] = [
     {
         accessorKey: 'created_at',
         header: ({column}) => {
-            return(
+            return (
                 <Button className={"space-x-2"} variant={"ghost"}
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    <span>Data de Criação</span> <FontAwesomeIcon icon={faArrowsUpDown} />
+                    <span>Data de Criação</span> <FontAwesomeIcon icon={faArrowsUpDown}/>
                 </Button>
             )
         },
@@ -89,15 +109,15 @@ export const columns: ColumnDef<Users>[] = [
 
             const {toast} = useToast()
 
-            return(
+            return (
                 <>
-                    <Dialog  open={isOpen} onOpenChange={() => setIsOpen(false)}>
+                    <Dialog open={isOpen} onOpenChange={() => setIsOpen(false)}>
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>Trocar Aluno de Turma</DialogTitle>
                             </DialogHeader>
                             <form className={"grid gap-5"}>
-                                <SelectTurmas />
+                                <SelectTurmas/>
                                 <div className={"grid justify-items-end"}>
                                     <Button>Salvar</Button>
                                 </div>
@@ -115,7 +135,8 @@ export const columns: ColumnDef<Users>[] = [
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogAction onClick={() => {/* lógica de salvar */}}>
+                                <AlertDialogAction onClick={() => {/* lógica de salvar */
+                                }}>
                                     Salvar
                                 </AlertDialogAction>
                                 <AlertDialogCancel onClick={() => setRemoveAlert(false)}>Cancelar</AlertDialogCancel>
@@ -123,7 +144,7 @@ export const columns: ColumnDef<Users>[] = [
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    <AlertDialog open={isAlertOpen} onOpenChange={() => setIsAlertOpen(false)} >
+                    <AlertDialog open={isAlertOpen} onOpenChange={() => setIsAlertOpen(false)}>
                         <AlertDialogContent>
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Apagar Aluno</AlertDialogTitle>
@@ -139,7 +160,7 @@ export const columns: ColumnDef<Users>[] = [
                                         variant: "default",
                                         description: response.message,
                                     })
-                                }} >Sim</AlertDialogAction>
+                                }}>Sim</AlertDialogAction>
                                 <AlertDialogCancel>Não</AlertDialogCancel>
                             </AlertDialogFooter>
                         </AlertDialogContent>
@@ -148,14 +169,14 @@ export const columns: ColumnDef<Users>[] = [
                         <DropdownMenuTrigger asChild>
                             <Button variant={"ghost"} size={"icon"}>
                                 <span className={"sr-only"}>Opções</span>
-                                <FontAwesomeIcon icon={faEllipsis} />
+                                <FontAwesomeIcon icon={faEllipsis}/>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setIsOpen(true )}>
-                               Trocar Turma
+                            <DropdownMenuSeparator/>
+                            <DropdownMenuItem onClick={() => setIsOpen(true)}>
+                                Trocar Turma
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setRemoveAlert(true)}>
                                 Retirar Aluno
@@ -166,6 +187,95 @@ export const columns: ColumnDef<Users>[] = [
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </>
+            )
+        }
+    }
+]
+
+export const userColumns: ColumnDef<Users>[] = [
+    {
+        accessorKey: "select",
+        header: ({table}) => (
+            <div></div>
+        ),
+        cell: ({row}) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: 'image',
+        header: 'Foto',
+        cell: ({row}) => {
+
+            const user = row.original
+
+            return (
+                <div className={"w-full flex justify-center"}>
+                    <Avatar>
+                        <AvatarImage className={"object-cover"} src={`${user.image}`}/>
+                        <AvatarFallback>
+                            {user?.name.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: 'name',
+        header: 'Nome',
+    },
+    {
+        accessorKey: 'email',
+        header: 'Email',
+    },
+    {
+        accessorKey: 'created_at',
+        header: ({column}) => {
+            return (
+                <Button className={"space-x-2"} variant={"ghost"}
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                    <span>Data de Criação</span> <FontAwesomeIcon icon={faArrowsUpDown}/>
+                </Button>
+            )
+        },
+        cell: ({row}) => {
+            const user = row.original
+            return Intl.DateTimeFormat('pt-br', {
+                dateStyle: "short",
+            }).format(user.created_at)
+        },
+        sortingFn: 'datetime'
+    },
+    {
+        id: 'actions',
+        enableHiding: false,
+        header: ({table}) => {
+            const selectCount = table.getSelectedRowModel().rows.length
+            const users = table.getSelectedRowModel().rows.map(row => row.original.id)
+            const handleSubmit = () => {
+                fetch('/api/turmas', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body:JSON.stringify({users, })
+                })
+            }
+
+            return (
+                selectCount > 0 && (<Button onClick={() => handleSubmit()}>Adicionar Alunos ({selectCount})</Button>)
+            )
+        },
+        cell: ({table}) => {
+            const selectedLength = table.getSelectedRowModel().rows.length
+            return (
+                selectedLength == 0 && (<Button>Adicionar Aluno</Button>)
             )
         }
     }

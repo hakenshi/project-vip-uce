@@ -1,12 +1,10 @@
-'use client'
-
 import React from 'react';
 
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRightFromBracket, IconDefinition} from "@fortawesome/free-solid-svg-icons";
-import {redirect, useRouter} from "next/navigation";
-import {router} from "next/client";
+import {redirect} from "next/navigation";
+import {cookies} from "next/headers";
 
 interface Link {
     link: string;
@@ -19,11 +17,14 @@ interface AsideProps {
 }
 
 const Aside: React.FC<AsideProps> = ({links}) => {
+    const logout = async () => {
+        'use server'
+        const token = cookies().get('token')
 
-    const router = useRouter();
-    const logout = () => {
-        sessionStorage.clear();
-        router.replace('/')
+        if (token){
+            cookies().delete('token')
+            redirect('/')
+        }
     }
 
     return (
@@ -36,10 +37,12 @@ const Aside: React.FC<AsideProps> = ({links}) => {
                     ))}
                 </ul>
             </div>
-            {/*<button onClick={() => logout()} className="flex justify-center items-center p-5 gap-5 text-lg">*/}
-            {/*    <FontAwesomeIcon icon={faRightFromBracket}/>*/}
-            {/*    <span className={"hidden md:inline"}>Sair</span>*/}
-            {/*</button>*/}
+            <form action={logout}>
+                <button className="flex justify-center items-center p-5 gap-5 text-lg">
+                    <FontAwesomeIcon icon={faRightFromBracket}/>
+                    <span className={"hidden md:inline"}>Sair</span>
+                </button>
+            </form>
         </aside>
     );
 };

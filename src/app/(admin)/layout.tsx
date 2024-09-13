@@ -6,13 +6,11 @@ import {faChalkboard, faChartColumn, faUserGroup} from "@fortawesome/free-solid-
 import {Users} from "@prisma/client";
 import {auth} from "@/actions/auth";
 import {UserEnum} from "@/enums/user-enum";
-import {redirect, useRouter} from "next/navigation";
-import {cookies} from "next/headers";
+import {redirect} from "next/navigation";
 
 export default function DashboardLayout({children}: { children: ReactNode; user: Users }) {
 
     const user = auth()
-
 
     if (user.userTypeId !== UserEnum.admin){
         redirect('/')

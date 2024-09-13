@@ -35,11 +35,9 @@ export default function Home() {
                 })
 
                 if (user.userTypeId === UserEnum.admin){
-                    revalidatePath('/')
                     redirect('/dashboard')
                 }
                 else{
-                    revalidatePath('/')
                     redirect('/turma')
                 }
             }
