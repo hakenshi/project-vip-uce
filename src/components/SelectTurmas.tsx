@@ -22,16 +22,14 @@ export default function selectTurmas(){
         }
     }, [])
 
-    console.log(turmas)
-
    return(
-       <Select>
+       <Select name={"turma"}>
             <SelectTrigger>
                 <SelectValue placeholder='Selecione Uma Turma' />
             </SelectTrigger>
             <SelectContent>
                 {turmas.map((turma) => (
-                    <SelectItem value={`${turma.levelId}`}>Turma {turma.levelId} </SelectItem>
+                    <SelectItem key={turma.id} value={`${turma.id}`}>Nível {turma.levelId} </SelectItem>
                 ))}
             </SelectContent>
        </Select>

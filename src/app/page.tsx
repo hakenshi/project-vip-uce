@@ -58,7 +58,8 @@ export default function Home() {
                 <FormInput name={"email"} label={"Email"} placeholder={"email@gmail.com"}/>
                 <FormInput type={'password'} name={"senha"} label={"Senha"} placeholder={"•••••••"}/>
                 <div className="flex justify-center">
-                    <button className="bg-red-600 hover:bg-red-700 p-2 text-white rounded w-44" type={"submit"}>Enviar
+                    <button className="bg-red-600 hover:bg-red-700 p-2 text-white rounded w-44" type={"submit"}>
+                        Enviar
                     </button>
                 </div>
             </form>

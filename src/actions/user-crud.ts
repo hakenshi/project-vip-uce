@@ -121,3 +121,39 @@ export async function deleteUser(email: string){
         }
     }
 }
+
+export async function updateUserClass(classId: number, userId: number) {
+    const token = cookies().get('token')
+
+    if (token){
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}turmas/${classId}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+                userId
+            })
+        })
+        if (response.ok){
+            revalidatePath('/turmas')
+            return response.json()
+        }
+    }
+}
+
+export async function removeUserFromClass (userId: number){
+    if (cookies().get('token')){
+       const user =  await db.users.update({
+            where: {
+                id: userId
+            },
+            data: {
+                classId: null
+            }
+        })
+
+        revalidatePath('/turmas')
+
+        return {
+            message: `${user.name} foi removido da turma.`
+        }
+    }
+}

@@ -4,9 +4,7 @@ import Image from "next/image";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faArrowsUpDown,
     faClipboard,
-    faEllipsis,
     faTrash,
     faUserGroup,
     faUserPlus
@@ -27,8 +25,6 @@ import {revalidatePath} from "next/cache";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import Loader from "@/components/loader";
-import {clsx} from "clsx";
 import {DataTable} from "@/app/(admin)/turmas/DataTable";
 
 export default async function AdminPage() {
@@ -45,7 +41,7 @@ export default async function AdminPage() {
     })
 
     const users = await db.users.findMany({
-        where:{
+        where: {
             classId: null
         }
     })
@@ -76,9 +72,7 @@ export default async function AdminPage() {
 
     async function postActivity(form: FormData) {
         'use server'
-
         console.log(form)
-
     }
 
     return (
@@ -110,19 +104,13 @@ export default async function AdminPage() {
                 </DialogContent>
             </Dialog>
             <div className={"flex gap-5 justify-center flex-wrap"}>
-                {classes.map((classes, index) =>{
-
-                    const userData = {
-                        users,
-                        idClasse: classes.id
-                    }
-
-                    return(
-                        <Card key={classes.id}
+                {classes.map((_class) => {
+                    return (
+                        <Card key={_class.id}
                               className={"flex flex-col justify-between gap-2 w-full max-w-96 min-h-56 bg-white rounded shadow-md"}>
                             <CardTitle className="p-4 w-full flex flex-col items-center justify-center">
                                 <Image width={80} height={80} src={"/LOGOVIP.png"} alt={""}/>
-                                <p className="text-sm text-center my-5 font-normal">Nível {classes.levelId}</p>
+                                <p className="text-sm text-center my-5 font-normal">Nível {_class.levelId}</p>
                             </CardTitle>
                             <CardFooter className={"border-t flex justify-between items-center p-0"}>
                                 <div className="p-2">
@@ -134,7 +122,7 @@ export default async function AdminPage() {
                                             <DialogHeader>
                                                 <DialogTitle className={"text-center"}>Alunos na Turma</DialogTitle>
                                             </DialogHeader>
-                                            <DataTable columns={columns} data={classes.users}/>
+                                            <DataTable columns={columns} data={_class.users} classId={_class.id}/>
                                         </DialogContent>
                                     </Dialog>
                                 </div>
@@ -145,12 +133,11 @@ export default async function AdminPage() {
                                         </DialogTrigger>
                                         <DialogContent className={"max-w-screen-lg"}>
                                             <DialogHeader>
-                                                <DialogTitle>Adicionar Aluno na Turma</DialogTitle>
+                                                <DialogTitle>Adicionar Alunos na Turma</DialogTitle>
                                             </DialogHeader>
-                                            <DataTable columns={userColumns} data={users}/>
+                                            <DataTable columns={userColumns} data={users} classId={_class.id}/>
                                         </DialogContent>
                                     </Dialog>
-
                                     <Dialog>
                                         <DialogTrigger className="open-dialog hover:bg-zinc-200 rounded-full">
                                             <FontAwesomeIcon icon={faClipboard} className="p-2"/>
@@ -195,7 +182,7 @@ export default async function AdminPage() {
                                                     'use server'
                                                     await db.classes.delete({
                                                         where: {
-                                                            id: classes.id
+                                                            id: _class.id
                                                         }
                                                     })
                                                     revalidatePath("/turmas")

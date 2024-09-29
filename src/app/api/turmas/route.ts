@@ -1,11 +1,13 @@
 import db from "../../../../prisma/db";
 import {NextRequest, NextResponse} from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
 
-    console.log(request);
-
-    const classes = await db.classes.findMany()
+    const classes = await db.classes.findMany({
+        orderBy: {
+            levelId: 'asc'
+        }
+    })
 
     return NextResponse.json({
         classes:classes
@@ -14,9 +16,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
 
-    const {users} = await request.json();
+    const {users, classId} = await request.json();
 
-
+    await db.users.updateMany({
+        where: {
+            id:{
+                in: users
+            }
+        },
+        data: {
+            classId:classId
+        }
+    })
 
     return NextResponse.json({
         "message": "debugging"

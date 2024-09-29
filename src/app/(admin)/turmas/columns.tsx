@@ -14,7 +14,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {useState} from "react";
+import {FormEvent, useRef, useState} from "react";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
@@ -23,7 +23,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import EditarAluno from "@/components/EditarAluno";
-import {deleteUser} from "@/actions/user-crud";
+import {deleteUser, removeUserFromClass, updateUserClass} from "@/actions/user-crud";
 import {useToast} from "@/hooks/use-toast";
 import {Select} from "@/components/ui/select";
 import SelectTurmas from "@/components/SelectTurmas";
@@ -99,15 +99,38 @@ export const columns: ColumnDef<Users>[] = [
     {
         id: 'actions',
         enableHiding: false,
-        cell: ({row}) => {
+        cell: ({row, table}) => {
 
             const user = row.original
-
+            const classId = table.options.meta?.classId
             const [isOpen, setIsOpen] = useState(false)
             const [removeAlert, setRemoveAlert] = useState(false)
             const [isAlertOpen, setIsAlertOpen] = useState(false)
-
             const {toast} = useToast()
+
+            const handleSumbit = async (e: FormEvent) => {
+
+                e.preventDefault()
+
+                if (e.target) {
+                    const turmaId = e.target.turma.value
+
+                    if (classId == turmaId) {
+                        alert("Esse aluno já está nessa turma.")
+                        return
+                    }
+
+                    const response = await updateUserClass(turmaId, user.id)
+
+                    if (response.message){
+                        toast({
+                            variant: "default",
+                            description: response.message,
+                        })
+                    }
+
+                }
+            }
 
             return (
                 <>
@@ -116,7 +139,7 @@ export const columns: ColumnDef<Users>[] = [
                             <DialogHeader>
                                 <DialogTitle>Trocar Aluno de Turma</DialogTitle>
                             </DialogHeader>
-                            <form className={"grid gap-5"}>
+                            <form onSubmit={handleSumbit} className={"grid gap-5"}>
                                 <SelectTurmas/>
                                 <div className={"grid justify-items-end"}>
                                     <Button>Salvar</Button>
@@ -135,7 +158,15 @@ export const columns: ColumnDef<Users>[] = [
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogAction onClick={() => {/* lógica de salvar */
+                                <AlertDialogAction onClick={async () => {
+                                    const response = await removeUserFromClass(user.id)
+
+                                    if (response?.message){
+                                        toast({
+                                            variant: "default",
+                                            description: response?.message
+                                        })
+                                    }
                                 }}>
                                     Salvar
                                 </AlertDialogAction>
@@ -192,12 +223,11 @@ export const columns: ColumnDef<Users>[] = [
     }
 ]
 
+
 export const userColumns: ColumnDef<Users>[] = [
     {
         accessorKey: "select",
-        header: ({table}) => (
-            <div></div>
-        ),
+        header: '',
         cell: ({row}) => (
             <Checkbox
                 checked={row.getIsSelected()}
@@ -231,11 +261,15 @@ export const userColumns: ColumnDef<Users>[] = [
         header: 'Nome',
     },
     {
-        accessorKey: 'email',
+        accessorKey: 'users.email',
         header: 'Email',
+        cell: ({row}) => {
+            const user = row.original
+            return user.email
+        }
     },
     {
-        accessorKey: 'created_at',
+        accessorKey: 'users.created_at',
         header: ({column}) => {
             return (
                 <Button className={"space-x-2"} variant={"ghost"}
@@ -256,15 +290,17 @@ export const userColumns: ColumnDef<Users>[] = [
         id: 'actions',
         enableHiding: false,
         header: ({table}) => {
+
             const selectCount = table.getSelectedRowModel().rows.length
             const users = table.getSelectedRowModel().rows.map(row => row.original.id)
+            const classId = table.options.meta?.classId
             const handleSubmit = () => {
-                fetch('/api/turmas', {
+                fetch(`/api/turmas`, {
                     method: 'post',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body:JSON.stringify({users, })
+                    body: JSON.stringify({users, classId})
                 })
             }
 
@@ -274,6 +310,7 @@ export const userColumns: ColumnDef<Users>[] = [
         },
         cell: ({table}) => {
             const selectedLength = table.getSelectedRowModel().rows.length
+            const classId = table.options.meta?.classId
             return (
                 selectedLength == 0 && (<Button>Adicionar Aluno</Button>)
             )

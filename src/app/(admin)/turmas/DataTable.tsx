@@ -15,9 +15,10 @@ import {Input} from "@/components/ui/input";
 interface DataTableProps<TData, TValue> {
     columns: Column<TData, TValue>[];
     data: TData[];
+    classId: number;
 }
 
-export function DataTable<TData, TValue> ({columns, data}: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue> ({columns, data, classId}: DataTableProps<TData, TValue>) {
 
     const table = useReactTable({
         data,
@@ -26,6 +27,9 @@ export function DataTable<TData, TValue> ({columns, data}: DataTableProps<TData,
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        meta: {
+            classId: classId,
+        }
     })
 
     return (

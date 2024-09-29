@@ -67,7 +67,7 @@ async function seed() {
             name: 'Admin',
             password: adminPassword,
             userTypeId: 1,
-            classId: 1,
+            classId: null,
         },
     });
 

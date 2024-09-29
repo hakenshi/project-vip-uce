@@ -29,7 +29,6 @@ export default function AvatarPreview({initialImage, name}: {initialImage: strin
                     <FontAwesomeIcon icon={faPencilAlt} className={"text-white text-2xl"}/>
                 </div>
             </Avatar>
-
         </div>
     )
 }
