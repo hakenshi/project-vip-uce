@@ -1,5 +1,12 @@
-export default function TurmaPage() {
+import { auth } from "@/actions/auth"
+import db from "../../../../prisma/db"
+
+export default async function TurmaPage() {
+
+    const user = auth()
+   
+
     return(
-        <h1>Turma</h1>
+        <h1>{turma.id} </h1>
     )
 }
