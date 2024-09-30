@@ -1,5 +1,6 @@
 import express, {Request, Response} from "express";
 import db from "../prisma/db";
+
 const app = express();
 const port = 8000
 
@@ -20,6 +21,19 @@ app.get('/turma/:id', async (request: Request, response: Response) => {
             error
         })
     }
+})
+
+app.get('/atividade/:id', async (req,res)=>{
+    const{id} = req.params
+    // @ts-ignore
+    const atividades = await db.classesActivities.findMany({
+        where:{
+            classId: parseInt(id)
+        }
+    })
+
+    res.status(200).json(atividades)
+
 })
 
 app.get('/', (request, response) => {

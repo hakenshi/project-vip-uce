@@ -17,12 +17,13 @@ model Levels {
 }
 
 model Classes {
-  id         Int      @id @default(autoincrement())
-  level      Levels   @relation(fields: [levelId], references: [id])
-  levelId    Int      @unique
+  id         Int                 @id @default(autoincrement())
+  level      Levels              @relation(fields: [levelId], references: [id])
+  levelId    Int                 @unique
   users      Users[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  activities ClassesActivities[]
+  created_at DateTime            @default(now())
+  updated_at DateTime            @updatedAt
 }
 
 model UserType {
@@ -32,11 +33,12 @@ model UserType {
 }
 
 model Activities {
-  id         Int      @id @default(autoincrement())
+  id         Int                 @id @default(autoincrement())
   title      String
   file       String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  classes    ClassesActivities[]
+  created_at DateTime            @default(now())
+  updated_at DateTime            @updatedAt
 }
 
 model Users {
@@ -52,4 +54,14 @@ model Users {
   birthDay   DateTime?
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
+}
+
+model ClassesActivities {
+  id           Int        @id @default(autoincrement())
+  classId      Int
+  class        Classes    @relation(fields: [classId], references: [id])
+  activitiesId Int
+  activity     Activities @relation(fields: [activitiesId], references: [id])
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
 }
