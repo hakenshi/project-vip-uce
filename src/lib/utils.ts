@@ -6,4 +6,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const nextSecret = process.env.NEXT_PUBLIC_SECRET || 'default-secret'
+export const nextSecret = 'default-secret'

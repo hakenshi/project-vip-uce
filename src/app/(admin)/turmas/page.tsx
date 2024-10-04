@@ -1,31 +1,28 @@
 import db from "../../../../prisma/db";
 import {Card, CardFooter, CardTitle} from "@/components/ui/card";
 import Image from "next/image";
-import React from "react";
+import React, {FormEvent} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faClipboard,
-    faTrash,
-    faUserGroup,
-    faUserPlus
-} from "@fortawesome/free-solid-svg-icons";
+import {faClipboard, faTrash, faUserGroup, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import {columns, userColumns} from "@/app/(admin)/turmas/columns";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Levels, Users} from "@prisma/client";
+import {Levels} from "@prisma/client";
 import {revalidatePath} from "next/cache";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
 import {DataTable} from "@/app/(admin)/turmas/DataTable";
+import ActivitiesForm from "@/app/(admin)/turmas/ActivitiesForm";
 
 export default async function AdminPage() {
 
@@ -67,12 +64,6 @@ export default async function AdminPage() {
         } catch (e) {
             console.log(e)
         }
-
-    }
-
-    async function postActivity(form: FormData) {
-        'use server'
-        console.log(form)
     }
 
     return (
@@ -107,7 +98,7 @@ export default async function AdminPage() {
                 {classes.map((_class) => {
                     return (
                         <Card key={_class.id}
-                              className={"flex flex-col justify-between gap-2 w-full max-w-96 min-h-56 bg-white rounded shadow-md"}>
+                              className={"flex flex-col justify-between gap-2 w-full max-w-96 min-h-56 bg-white rounded shadow-md transition-all hover:cursor-pointer hover:scale-[102%]"}>
                             <CardTitle className="p-4 w-full flex flex-col items-center justify-center">
                                 <Image width={80} height={80} src={"/LOGOVIP.png"} alt={""}/>
                                 <p className="text-sm text-center my-5 font-normal">Nível {_class.levelId}</p>
@@ -146,24 +137,7 @@ export default async function AdminPage() {
                                             <DialogHeader>
                                                 <DialogTitle>Postar Atividade</DialogTitle>
                                             </DialogHeader>
-                                            <form action={postActivity} className={"flex flex-col gap-5"}>
-                                                <div>
-                                                    <Label>Insira um título para a atividade</Label>
-                                                    <Input name={"title"}/>
-                                                </div>
-                                                <div>
-                                                    <Label>Insira uma descrição para a atividade</Label>
-                                                    <Textarea name={"description"} style={{resize: "none"}}/>
-                                                </div>
-                                                <div>
-                                                    <Label>Anexe um arquivo para a atividade (Não é obrigatório)</Label>
-                                                    <Input name={"file"} type="file"/>
-                                                </div>
-
-                                                <div className={"flex w-full justify-end"}>
-                                                    <Button type="submit"> Postar Atividade</Button>
-                                                </div>
-                                            </form>
+                                            <ActivitiesForm />
                                         </DialogContent>
                                     </Dialog>
 

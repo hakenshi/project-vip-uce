@@ -52,7 +52,7 @@ export default function CadastrarAluno() {
             })
         }
 
-        if (response.message && response.status == 201){
+        if (response?.message && response?.status == 201){
             toast({
                 variant: "default",
                 description: response.message

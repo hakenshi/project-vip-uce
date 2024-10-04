@@ -1,7 +1,7 @@
 'use client'
 
 import {ColumnDef} from "@tanstack/table-core";
-import {Classes, Users} from "@prisma/client";
+import {Activities, Classes, Users} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
 import {faArrowsUpDown, faEllipsis} from "@fortawesome/free-solid-svg-icons";
@@ -314,6 +314,23 @@ export const userColumns: ColumnDef<Users>[] = [
             return (
                 selectedLength == 0 && (<Button>Adicionar Aluno</Button>)
             )
+        }
+    }
+]
+
+export const activitiesColumns: ColumnDef<Activities>[] = [
+    {
+        accessorKey: 'title',
+        header: 'Título',
+        cell: ({row}) => {
+            return (row.original.title)
+        }
+    },
+    {
+        accessorKey: 'description',
+        header: 'Descrição',
+        cell: ({row}) => {
+            return(row.original.description)
         }
     }
 ]

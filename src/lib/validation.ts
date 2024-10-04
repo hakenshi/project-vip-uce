@@ -55,4 +55,10 @@ export const UserEditSchema = z.object({
     password: z.string().optional()
 });
 
+export const ActivitySchema = z.object({
+    title: z.string().min(1, 'O título é obrigatório'),
+    description: z.string().min(1, "A descrição é obrigatória."),
+    file: z.instanceof(File).optional(),
+})
+
 export type UserEditValidation = z.infer<typeof UserEditSchema>;
