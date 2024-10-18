@@ -2,11 +2,11 @@ import {storeFile} from "@/lib/images";
 import {ActivitySchema} from "@/lib/validation";
 import {NextRequest, NextResponse} from "next/server";
 import db from "../../../../prisma/db";
+import {revalidatePath} from "next/cache";
 
 export async function POST(request: NextRequest) {
 
     const form = await request.formData();
-
     const novaAtividade = {
         title: form.get("title") as string,
         description: form.get('description') as string,
@@ -31,13 +31,22 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        await db.activities.create({
+        const atvidade = await db.activities.create({
             data: {
                 title: novaAtividade.title,
                 description: novaAtividade.description,
                 file: activityFile,
             }
         })
+
+        await db.classesActivities.create({
+            data: {
+                classId: parseInt(form.get('classId') as string),
+                activitiesId: atvidade.id
+            }
+        })
+
+        revalidatePath('/turmas')
 
         return NextResponse.json({
             message: "Atividade postada com sucesso",

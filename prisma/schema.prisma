@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,13 +17,14 @@ model Levels {
 }
 
 model Classes {
-  id         Int                 @id @default(autoincrement())
-  level      Levels              @relation(fields: [levelId], references: [id])
-  levelId    Int                 @unique
-  users      Users[]
-  activities ClassesActivities[]
-  created_at DateTime            @default(now())
-  updated_at DateTime            @updatedAt
+  id             Int                 @id @default(autoincrement())
+  level          Levels              @relation(fields: [levelId], references: [id])
+  levelId        Int                 @unique
+  users          Users[]
+  activities     ClassesActivities[]
+  created_at     DateTime            @default(now())
+  updated_at     DateTime            @updatedAt
+  UserActivities UserActivities[]
 }
 
 model UserType {
@@ -33,36 +34,56 @@ model UserType {
 }
 
 model Activities {
-  id          Int                 @id @default(autoincrement())
-  title       String
-  description String
-  file        String?
-  classes     ClassesActivities[]
-  created_at  DateTime            @default(now())
-  updated_at  DateTime            @updatedAt
+  id             Int                 @id @default(autoincrement())
+  title          String
+  description    String
+  file           String?
+  classes        ClassesActivities[]
+  created_at     DateTime            @default(now())
+  updated_at     DateTime            @updatedAt
+  UserActivities UserActivities[]
 }
 
 model Users {
-  id         Int       @id @default(autoincrement())
-  class      Classes?  @relation(fields: [classId], references: [id])
-  classId    Int?
-  userType   UserType  @relation(fields: [userTypeId], references: [id])
-  userTypeId Int       @default(2)
-  email      String    @unique
-  name       String
-  image      String?
-  password   String
-  birthDay   DateTime?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  id             Int              @id @default(autoincrement())
+  class          Classes?         @relation(fields: [classId], references: [id])
+  classId        Int?
+  userType       UserType         @relation(fields: [userTypeId], references: [id])
+  userTypeId     Int              @default(2)
+  email          String           @unique
+  name           String
+  image          String?
+  password       String
+  birthDay       DateTime?
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  UserActivities UserActivities[]
 }
 
 model ClassesActivities {
   id           Int        @id @default(autoincrement())
   classId      Int
-  class        Classes    @relation(fields: [classId], references: [id])
+  class        Classes    @relation(fields: [classId], references: [id], onDelete: Cascade)
   activitiesId Int
-  activity     Activities @relation(fields: [activitiesId], references: [id])
+  activity     Activities @relation(fields: [activitiesId], references: [id], onDelete: Cascade)
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
+}
+
+model UserActivities {
+  id         Int            @id @default(autoincrement())
+  userId     Int
+  user       Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityId Int
+  activity   Activities     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  classId    Int
+  class      Classes        @relation(fields: [classId], references: [id])
+  status     ActivityStatus @default(PENDING)
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt
+}
+
+enum ActivityStatus {
+  PENDING
+  COMPLETED
 }

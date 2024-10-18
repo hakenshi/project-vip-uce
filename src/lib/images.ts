@@ -24,6 +24,29 @@ export async function storeFile(form: FormData){
     }
 
 }
+export async function updateStoreFile(form: FormData){
+    const file = form.get('file') as File
+    const fileDir = path.join('public', 'files')
+
+    if (file.size > 0){
+        const newFilePath = `${new Date().toISOString().replace(/:/g, '-')}${path.extname(file.name)}`;
+        const fullFilePath = path.join(fileDir, newFilePath);
+        if(!fs.existsSync(fileDir)){
+            fs.mkdirSync(fileDir, { recursive: true });
+        }
+
+        fs.writeFile(
+            fullFilePath,
+            Buffer.from(await file.arrayBuffer()),
+            (err: NodeJS.ErrnoException | null) => {
+                if (err) throw new Error(err.message);
+            }
+        )
+
+        return `files/${newFilePath}`;
+    }
+
+}
 
 export async function storeImage(form: FormData) {
     const image = form.get('image') as File

@@ -17,7 +17,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
-import {columns, userColumns} from "@/app/(admin)/turmas/columns";
+import {activitiesColumns, columns, userColumns} from "@/app/(admin)/turmas/columns";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Levels} from "@prisma/client";
 import {revalidatePath} from "next/cache";
@@ -31,6 +31,11 @@ export default async function AdminPage() {
             id: true,
             levelId: true,
             users: true,
+            activities: {
+                select: {
+                    activity: true
+                }
+            },
         },
         orderBy: {
             levelId: "asc",
@@ -96,6 +101,9 @@ export default async function AdminPage() {
             </Dialog>
             <div className={"flex gap-5 justify-center flex-wrap"}>
                 {classes.map((_class) => {
+
+                    const atividades = _class.activities
+
                     return (
                         <Card key={_class.id}
                               className={"flex flex-col justify-between gap-2 w-full max-w-96 min-h-56 bg-white rounded shadow-md transition-all hover:cursor-pointer hover:scale-[102%]"}>
@@ -133,11 +141,9 @@ export default async function AdminPage() {
                                         <DialogTrigger className="open-dialog hover:bg-zinc-200 rounded-full">
                                             <FontAwesomeIcon icon={faClipboard} className="p-2"/>
                                         </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Postar Atividade</DialogTitle>
-                                            </DialogHeader>
-                                            <ActivitiesForm />
+                                        <DialogContent className={"max-w-screen-lg"}>
+                                            <DataTable columns={activitiesColumns} data={atividades} classId={_class.id}
+                                                       isActivity={true}/>
                                         </DialogContent>
                                     </Dialog>
 

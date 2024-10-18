@@ -7,13 +7,15 @@ import {Button} from "@/components/ui/button";
 import React, {FormEvent} from "react";
 import {toast} from "@/hooks/use-toast";
 import {ActivitySchema} from "@/lib/validation";
+import {storeActivity, updateActivity} from "@/actions/activies";
+import {Activities} from "@prisma/client";
 
-export default function ActivitiesForm() {
-
-    const handleSubmit = async (e:FormEvent<HTMLFormElement>) => {
+export default function ActivitiesForm({classId, activity}: { classId?: number; activity?:Activities }) {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         const form = new FormData(e.currentTarget);
+        form.append('classId', `${classId}`)
         const novaAtividade = {
             title: form.get("title"),
             description: form.get('description'),
@@ -23,8 +25,7 @@ export default function ActivitiesForm() {
 
         const result = ActivitySchema.safeParse(novaAtividade);
 
-        if (!result.success){
-
+        if (!result.success) {
             const messages = result.error.errors.map(e => e.message).join('\n')
             toast({
                 variant: "destructive",
@@ -33,29 +34,18 @@ export default function ActivitiesForm() {
             return
         }
 
-        const response = await fetch(process.env.NEXT_PUBLIC_API+"atividades", {
-            method: "POST",
-            body: form
-        })
+        const response = activity ? await updateActivity(form, activity.id) : await storeActivity(form);
 
-        if (!response.ok){
-            return
-        }
-
-        const data = await response.json();
-
-        console.log(data)
-
-        if (data?.error){
+        if (response?.error) {
             toast({
                 variant: "destructive",
-                description: data.error
+                description: response.error
             })
         }
-        if (data?.message && data?.status === 201){
+        if (response?.message && response?.status === 201) {
             toast({
                 variant: "default",
-                description: data.message,
+                description: response.message,
             })
         }
 
@@ -65,11 +55,11 @@ export default function ActivitiesForm() {
         <form onSubmit={handleSubmit} className={"flex flex-col gap-5"}>
             <div>
                 <Label>Insira um título para a atividade</Label>
-                <Input name={"title"}/>
+                <Input defaultValue={activity?.title ?? ""} name={"title"}/>
             </div>
             <div>
                 <Label>Insira uma descrição para a atividade</Label>
-                <Textarea name={"description"} style={{resize: "none"}}/>
+                <Textarea defaultValue={activity?.description} name={"description"} style={{resize: "none"}}/>
             </div>
             <div>
                 <Label>Anexe um arquivo para a atividade (Não é obrigatório)</Label>

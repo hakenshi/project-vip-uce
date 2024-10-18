@@ -114,7 +114,6 @@ export async function deleteUser(email: string){
         const response = await fetch(`${process.env.NEXT_PUBLIC_API}user/${email}`,{
             method: "DELETE"
         })
-    
         if (response.ok){
             revalidatePath('/alunos')
             return response.json()

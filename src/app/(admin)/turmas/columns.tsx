@@ -1,7 +1,7 @@
 'use client'
 
 import {ColumnDef} from "@tanstack/table-core";
-import {Activities, Classes, Users} from "@prisma/client";
+import {Activities, Users} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
 import {faArrowsUpDown, faEllipsis} from "@fortawesome/free-solid-svg-icons";
@@ -14,20 +14,24 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {FormEvent, useRef, useState} from "react";
+import React, {FormEvent, useRef, useState} from "react";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogTitle
+    AlertDialogTitle, AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import EditarAluno from "@/components/EditarAluno";
 import {deleteUser, removeUserFromClass, updateUserClass} from "@/actions/user-crud";
-import {useToast} from "@/hooks/use-toast";
+import {toast, useToast} from "@/hooks/use-toast";
 import {Select} from "@/components/ui/select";
 import SelectTurmas from "@/components/SelectTurmas";
 import {Checkbox} from "@/components/ui/checkbox";
+import db from "../../../../prisma/db";
+import {revalidatePath} from "next/cache";
+import {deleteActivity} from "@/actions/activies";
+import ActivitiesForm from "@/app/(admin)/turmas/ActivitiesForm";
 
 
 export const columns: ColumnDef<Users>[] = [
@@ -122,7 +126,7 @@ export const columns: ColumnDef<Users>[] = [
 
                     const response = await updateUserClass(turmaId, user.id)
 
-                    if (response.message){
+                    if (response.message) {
                         toast({
                             variant: "default",
                             description: response.message,
@@ -161,7 +165,7 @@ export const columns: ColumnDef<Users>[] = [
                                 <AlertDialogAction onClick={async () => {
                                     const response = await removeUserFromClass(user.id)
 
-                                    if (response?.message){
+                                    if (response?.message) {
                                         toast({
                                             variant: "default",
                                             description: response?.message
@@ -318,19 +322,81 @@ export const userColumns: ColumnDef<Users>[] = [
     }
 ]
 
-export const activitiesColumns: ColumnDef<Activities>[] = [
+export const activitiesColumns: ColumnDef<{ activity: Activities }>[] = [
     {
-        accessorKey: 'title',
+        accessorKey: 'activity.title',
         header: 'Título',
+    },
+    {
+        accessorKey: 'activity.description',
+        header: 'Descrição',
+    },
+    {
+        accessorKey: 'activity.created_at',
+        header: "Data de postagem",
         cell: ({row}) => {
-            return (row.original.title)
+            return Intl.DateTimeFormat('pt-br', {
+                dateStyle: "short",
+            }).format(new Date(row.original.activity.created_at))
         }
     },
     {
-        accessorKey: 'description',
-        header: 'Descrição',
-        cell: ({row}) => {
-            return(row.original.description)
+        accessorKey: 'activity.actions',
+        header: '',
+        cell: ({row, table}) => {
+
+            const {id} = row.original.activity
+            const classId = table.options.meta?.classId
+
+            return (
+                <div className={"flex gap-2 justify-center"}>
+                   <Dialog>
+                       <DialogTrigger className={"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-sky-500 text-secondary hover:bg-sky-600/80 h-10 px-4 py-2"}>Editar</DialogTrigger>
+                       <DialogContent>
+                           <DialogTitle>
+                               Editar Atividade
+                           </DialogTitle>
+                           <DialogContent >
+                               <DialogHeader>
+                                   <DialogTitle>Postar Atividade</DialogTitle>
+                               </DialogHeader>
+                               <ActivitiesForm activity={row.original.activity} classId={classId} />
+                           </DialogContent>
+                       </DialogContent>
+                   </Dialog>
+                    <AlertDialog>
+                        <AlertDialogTrigger
+                            className={"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"}>Excluir</AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir Atividade</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Ao clicar em sim, a atividade será exlcuida. Você tem certeza de que deseja excluir?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogAction onClick={async () => {
+                                    const response = await deleteActivity(id)
+
+                                    if (response?.status === 204) {
+                                        toast({
+                                            variant: "default",
+                                            description: response.messase
+                                        })
+                                    } else {
+                                        toast({
+                                            variant: "destructive",
+                                            description: response?.message
+                                        })
+                                    }
+
+                                }}>Confirmar</AlertDialogAction>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+            )
         }
     }
 ]
