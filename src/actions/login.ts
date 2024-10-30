@@ -2,9 +2,10 @@ import {Users} from "@prisma/client";
 import {cookies} from "next/headers";
 import {UserEnum} from "@/enums/user-enum";
 import {redirect} from "next/navigation";
+import {toast} from "@/hooks/use-toast";
 
 export const login = async (form: FormData) => {
-    'use server'
+
     const response = await fetch('http://localhost:8000/login', {
         method: 'POST',
         headers:{
@@ -43,6 +44,9 @@ export const login = async (form: FormData) => {
         }
     }
     else {
-        console.log('email ou senha incorretos')
+        toast({
+            variant: "destructive",
+            description: "Email ou senha incorretos."
+        })
     }
 }

@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import {nextSecret} from "../src/lib/utils";
+import {Server} from "socket.io";
 const app = express();
 const port = 8000
 
@@ -84,6 +85,34 @@ app.get('/', (request, response) => {
         message: "hello xd"
     })
 })
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log("Express api is running at http://localhost:" + port);
 })
+
+const io = new Server(server, {
+    cors: {
+        origin: "localhost:3000",
+        credentials: true
+    }
+});
+
+io.on('connection', (socket) => {
+    socket.on('nova-atividade', async (atividadeId: number) => {
+        try {
+            const atividade = await db.classesActivities.findFirstOrThrow({
+                where: {
+                    id: atividadeId
+                },
+                include: {
+                    class: true
+                }
+            });
+            
+            io.emit(`turma-${atividade.classId}`, {
+                message: `Uma nova atividade foi postada na turma ${atividade.class.levelId}`
+            });
+        } catch (error) {
+            console.error('Erro ao processar nova atividade:', error);
+        }
+    });
+});

@@ -3,10 +3,9 @@
 import {cookies} from "next/headers";
 import db from "../../prisma/db";
 import {revalidatePath} from "next/cache";
-import {NextResponse} from "next/server";
-import {Simulate} from "react-dom/test-utils";
 import {storeFile} from "@/lib/images";
 import {ActivitySchema} from "@/lib/validation";
+import {io} from "socket.io-client"
 
 export async function deleteActivity(id: number) {
     if (cookies().get('token')) {
@@ -66,9 +65,12 @@ export async function storeActivity(form: FormData) {
             }
         })
 
+        const socket = io()
+        socket.emit('nova-atividade', atvidade.id);
+        
         revalidatePath('/turmas')
         return {
-            message: "Atividade postada com sucesso",
+            message: "Atividade postada com sucesso, os alunos serão notificados.",
             status: 201,
         }
 
@@ -81,7 +83,7 @@ export async function updateActivity(form: FormData, id: number | undefined) {
     const novaAtividade = {
         title: form.get("title") as string,
         description: form.get('description') as string,
-        file: form.get('file'),
+        file: form.get('file')
     }
     const file = form.get('file') as File
 

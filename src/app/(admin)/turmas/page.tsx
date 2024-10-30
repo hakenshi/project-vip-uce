@@ -64,7 +64,6 @@ export default async function AdminPage() {
                     levelId: parseInt(form.get('class') as string),
                 }
             })
-
             revalidatePath('/turmas')
         } catch (e) {
             console.log(e)
