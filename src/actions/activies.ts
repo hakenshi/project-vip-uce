@@ -6,6 +6,7 @@ import {revalidatePath} from "next/cache";
 import {storeFile} from "@/lib/images";
 import {ActivitySchema} from "@/lib/validation";
 import {io} from "socket.io-client"
+import {socket} from "../../express/socket.io";
 
 export async function deleteActivity(id: number) {
     if (cookies().get('token')) {
@@ -65,7 +66,6 @@ export async function storeActivity(form: FormData) {
             }
         })
 
-        const socket = io()
         socket.emit('nova-atividade', atvidade.id);
         
         revalidatePath('/turmas')

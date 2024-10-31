@@ -18,7 +18,6 @@ interface DataTableProps<TData, TValue> {
     isActivity?: boolean;
 }
 
-
 export default function DataTable<TData, TValue> ({columns, data}: DataTableProps<TData, TValue>){
 
     const table = useReactTable({

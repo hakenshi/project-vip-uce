@@ -97,6 +97,14 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
+    console.log("socket.io rodando.")
+
+    socket.on('auth-user', (classId, callback) => {
+        socket.join(`turma-${classId}`)
+        console.log("usuário conectado com sucesso.")
+        callback({success:true})
+    })
+
     socket.on('nova-atividade', async (atividadeId: number) => {
         try {
             const atividade = await db.classesActivities.findFirstOrThrow({
@@ -107,10 +115,10 @@ io.on('connection', (socket) => {
                     class: true
                 }
             });
-            
-            io.emit(`turma-${atividade.classId}`, {
+            io.to(`turma-${atividade.classId}`).emit(`turma-${atividade.classId}`, {
                 message: `Uma nova atividade foi postada na turma ${atividade.class.levelId}`
             });
+            console.log(`Notificação enviada para a turma ${atividade.classId}`)
         } catch (error) {
             console.error('Erro ao processar nova atividade:', error);
         }

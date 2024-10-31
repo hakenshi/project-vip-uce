@@ -17,6 +17,8 @@ import {cookies} from "next/headers";
 import jwt from "jsonwebtoken";
 import {nextSecret} from "@/lib/utils";
 import {updateStoreImage} from "@/lib/images";
+import {UserEnum} from "@/enums/user-enum";
+import Notificacao from "@/components/Notificacao";
 
 const Nav = ({user}: { user: Users }) => {
 
@@ -51,12 +53,13 @@ const Nav = ({user}: { user: Users }) => {
         cookies().set('token', updatedUserToken)
 
         revalidatePath('/dashboard')
-
-        return {success: true}
     }
 
     return (
-        <nav className="w-full flex justify-end items-center p-7 bg-gradient-to-tr from-red-600 to-red-700">
+        <nav className="w-full flex justify-end gap-5 items-center p-7 bg-gradient-to-tr from-red-600 to-red-700">
+            {user.userTypeId === UserEnum.users && (
+                <Notificacao classId={user.classId} />
+            )}
             <Dialog>
                 <DialogTrigger>
                     <Avatar>

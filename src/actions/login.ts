@@ -25,28 +25,8 @@ export const login = async (form: FormData) => {
 
     const {user, token}:{user: Users, token: string} = await response.json();
 
-    if (user && token){
-        if (token) {
-            cookies().set('token', token, {
-                httpOnly: true,
-                maxAge: 24 * 60 * 60 * 1000,
-                path: '/',
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-            })
+    return {
+        user, token
+    }
 
-            if (user.userTypeId === UserEnum.admin){
-                redirect('/dashboard')
-            }
-            else{
-                redirect('/turma')
-            }
-        }
-    }
-    else {
-        toast({
-            variant: "destructive",
-            description: "Email ou senha incorretos."
-        })
-    }
 }
