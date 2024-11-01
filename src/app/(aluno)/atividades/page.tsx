@@ -1,5 +1,11 @@
-export default function AtividadePage() {
+import ListaAtividade from "@/components/ListaAtividade";
+import db from "../../../../prisma/db";
+
+export default async function AtividadePage() {
+    const atividades = await db.activities.findMany()
     return(
-        <h1>Atividades</h1>
+        <main>
+            <ListaAtividade atividades={atividades}/>
+        </main>
     )
 }

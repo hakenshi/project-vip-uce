@@ -5,11 +5,12 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import {nextSecret} from "../src/lib/utils";
 import {Server} from "socket.io";
+import { log } from "node:console";
 const app = express();
 const port = 8000
 
 app.use(cors({
-    origin: "localhost:3000",
+    origin: "http://localhost:3000",
     credentials: true
 }))
 app.use(express.json());
@@ -33,6 +34,8 @@ app.get('/turma/:id', async (request: Request, response: Response) => {
 app.post('/login', async (request: Request, response: Response) => {
 
     const {email, senha} = request.body;
+
+
 
     try {
         const user = await db.users.findFirstOrThrow({
