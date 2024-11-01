@@ -5,7 +5,11 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import {nextSecret} from "../src/lib/utils";
 import {Server} from "socket.io";
+<<<<<<< Updated upstream
 import { log } from "node:console";
+=======
+
+>>>>>>> Stashed changes
 const app = express();
 const port = 8000
 
@@ -15,6 +19,22 @@ app.use(cors({
 }))
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
+app.get('/turma/notificao/:id', async (request: Request, response: Response) => {
+    try {
+        const {id} = request.params
+        response.status(200).json(await db.notifications.findMany({
+            where: {
+                id: parseInt(id)
+            }
+        }))
+    } catch (error) {
+        response.status(404).json({
+            error
+        })
+    }
+})
+
 app.get('/turma/:id', async (request: Request, response: Response) => {
     try {
         const {id} = request.params;
@@ -39,7 +59,7 @@ app.post('/login', async (request: Request, response: Response) => {
 
     try {
         const user = await db.users.findFirstOrThrow({
-            where:{
+            where: {
                 email,
             }
         })
@@ -56,9 +76,8 @@ app.post('/login', async (request: Request, response: Response) => {
         response.status(200).json({
             user, token
         })
-    }
-    catch (e:any){
-        if (e.name == "NotFoundError"){
+    } catch (e: any) {
+        if (e.name == "NotFoundError") {
             response.status(404).json({
                 message: "Usuaŕio não encontrado."
             })
@@ -71,11 +90,11 @@ app.post('/login', async (request: Request, response: Response) => {
     }
 })
 
-app.get('/atividade/:id', async (req,res)=>{
-    const{id} = req.params
+app.get('/atividade/:id', async (req, res) => {
+    const {id} = req.params
 
     const atividades = await db.classesActivities.findMany({
-        where:{
+        where: {
             classId: parseInt(id)
         }
     })
@@ -105,7 +124,7 @@ io.on('connection', (socket) => {
     socket.on('auth-user', (classId, callback) => {
         socket.join(`turma-${classId}`)
         console.log("usuário conectado com sucesso.")
-        callback({success:true})
+        callback({success: true})
     })
 
     socket.on('nova-atividade', async (atividadeId: number) => {
@@ -118,8 +137,16 @@ io.on('connection', (socket) => {
                     class: true
                 }
             });
+
+            const notification = await db.notifications.create({
+                data: {
+                    classId: atividade.classId,
+                    notificationType: "MESSAGE"
+                }
+            })
+
             io.to(`turma-${atividade.classId}`).emit(`turma-${atividade.classId}`, {
-                message: `Uma nova atividade foi postada na turma ${atividade.class.levelId}`
+                notification: `${notification.notificationType}`
             });
             console.log(`Notificação enviada para a turma ${atividade.classId}`)
         } catch (error) {

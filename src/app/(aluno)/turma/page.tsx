@@ -25,7 +25,7 @@ export default async function TurmaPage() {
     return (
         myClass?.class ?
             (
-                <div className={"flex flex-col justify-center items-center h-1/2"}>
+                <div className={"flex flex-col justify-center items-center h-full my-5 md:h-1/2"}>
                     <div className={"w-9/12 p-10 rounded flex flex-col gap-5 items-center border-2"}>
                         <div className={"flex flex-col items-center"}>
                             <Image width={80+10} height={100-10} src={"/LOGOVIP.png"} alt={"logo english pinhal"}/>

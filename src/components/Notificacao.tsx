@@ -14,22 +14,43 @@ import {useEffect, useState} from "react";
 import {io} from "socket.io-client";
 import Link from "next/link";
 import {socket} from "../../express/socket.io";
+import {Notifications} from "@prisma/client";
 
 export default function Notificacao({classId}: { classId: number }) {
     const [notificacoes, setNotificacoes] = useState<string[] | []>([])
 
     useEffect(() => {
-        if (classId){
-            socket.on(`turma-${classId}`, (message: string) => {
-                console.log(`Mensagem recebida: ${message}`)
-                setNotificacoes(n => [...n, message])
-            })
+        socket.on(`turma-${classId}`, async ({notification}) => {
+            const response = await fetch(`http://localhost:8000/turma/notificao/${classId}`)
+            const data: Notifications = await response.json()
 
-            return () => {
-                socket.off(`turma-${classId}`)
+            if (notification) {
+                const getMessage = (message: "MESSAGE" | "ALERT") => {
+                    const messageTypes = {
+                        "MESSAGE": "Você tem uma nova atividade",
+
+                        "ALERT": "Você tem uma atividade pendente."
+                    }
+                    const notificationMessage = messageTypes[message]
+                    if (!notificationMessage) {
+                        alert("Tipo de mensagem inexistente")
+                        return
+                    }
+
+                    return {notificationType: messageTypes, notificationMessage}
+                }
+
+                const newMessage = getMessage(data.notificationType)?.notificationMessage;
+                if (newMessage) {
+                    setNotificacoes((n) => [...n, newMessage])
+                }
             }
+        })
+
+        return () => {
+            socket.off(`turma-${classId}`)
         }
-    }, [classId])
+    }, [notificacoes])
 
     const limparNotificacao = () => {
         setNotificacoes([])
