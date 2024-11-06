@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Levels {
@@ -56,9 +57,6 @@ model Users {
   UserActivities UserActivities[]
   class          Classes?         @relation(fields: [classId], references: [id])
   userType       UserType         @relation(fields: [userTypeId], references: [id])
-
-  @@index([classId], map: "Users_classId_fkey")
-  @@index([userTypeId], map: "Users_userTypeId_fkey")
 }
 
 model ClassesActivities {
@@ -69,9 +67,6 @@ model ClassesActivities {
   updated_at   DateTime   @updatedAt
   activity     Activities @relation(fields: [activitiesId], references: [id], onDelete: Cascade)
   class        Classes    @relation(fields: [classId], references: [id], onDelete: Cascade)
-
-  @@index([activitiesId], map: "ClassesActivities_activitiesId_fkey")
-  @@index([classId], map: "ClassesActivities_classId_fkey")
 }
 
 model UserActivities {
@@ -79,27 +74,21 @@ model UserActivities {
   userId     Int
   activityId Int
   classId    Int
-  status     ActivityStatus @default(PENDING)
   created_at DateTime       @default(now())
   updated_at DateTime       @updatedAt
+  status     ActivityStatus @default(PENDING)
   activity   Activities     @relation(fields: [activityId], references: [id], onDelete: Cascade)
   class      Classes        @relation(fields: [classId], references: [id])
   user       Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([activityId], map: "UserActivities_activityId_fkey")
-  @@index([classId], map: "UserActivities_classId_fkey")
-  @@index([userId], map: "UserActivities_userId_fkey")
 }
 
 model Notifications {
   id               Int              @id @default(autoincrement())
   classId          Int
-  notificationType NotificationType
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
+  notificationType NotificationType
   class            Classes          @relation(fields: [classId], references: [id])
-
-  @@index([classId], map: "Notifications_classId_fkey")
 }
 
 enum NotificationType {

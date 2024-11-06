@@ -1,13 +1,12 @@
 -- CreateTable
-CREATE TABLE `Notifications` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `classId` INTEGER NOT NULL,
-    `notificationType` ENUM('ALERT', 'MESSAGE') NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE TABLE "Notifications" (
+                                 "id" SERIAL PRIMARY KEY,
+                                 "classId" INTEGER NOT NULL,
+                                 "notificationType" VARCHAR(10) CHECK ("notificationType" IN ('ALERT', 'MESSAGE')) NOT NULL,
+                                 "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                 "updated_at" TIMESTAMP(3) NOT NULL
+);
 
 -- AddForeignKey
-ALTER TABLE `Notifications` ADD CONSTRAINT `Notifications_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Classes`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Notifications"
+    ADD CONSTRAINT "Notifications_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Classes"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
