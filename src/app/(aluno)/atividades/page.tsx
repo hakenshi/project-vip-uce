@@ -4,19 +4,20 @@ import {Card, CardDescription, CardFooter, CardHeader, CardTitle} from "@/compon
 import {Button, buttonVariants} from "@/components/ui/button";
 import {auth} from "@/actions/auth";
 import Link from "next/link";
+import {revalidatePath} from "next/cache";
 
 
 type SearchParams = {
     searchParams: {
-        status: "PENDING" | "COMPLETED"
+        status: "COMPLETED"
     }
 }
 
-export default async function AtividadePage({searchParams}:SearchParams) {
+export default async function AtividadePage({searchParams}: SearchParams) {
     const user = await auth();
     const {status} = searchParams;
-    const atividadesDoBanco = await db.activities.findMany({
-        where:{
+    const atividadesPendentes = await db.activities.findMany({
+        where: {
             classes: {
                 some: {
                     classId: user.classId as number
@@ -26,19 +27,19 @@ export default async function AtividadePage({searchParams}:SearchParams) {
     })
 
     // Busca atividades de acordo com o status
-    const filtroAtividades = await db.userActivities.findMany({
+    const atividadesCompletadas = await db.userActivities.findMany({
         where: {
             userId: user.id,
-            status: "COMPLETED"  // padrão para atividades pendentes se não houver status
+            status: "COMPLETED"
         },
         include: {
-            activity: true, // Inclui os dados da atividade
+            activity: true
         }
     });
 
-    const deleteActivity = async (id:number)=>{
+    const deleteActivity = async (id: number) => {
         'use server'
-        if(user) {
+        if (user) {
             await db.userActivities.create({
                 data: {
                     activityId: id,
@@ -48,35 +49,57 @@ export default async function AtividadePage({searchParams}:SearchParams) {
                 }
             })
         }
+        revalidatePath("/atividades")
     }
+
+    const atividadesCompletedasFiltro = atividadesCompletadas.map(userActivity => userActivity.activityId)
 
     return (
         <main>
-            <div>
-                <Link href={"?status=PENDING"}  className={buttonVariants({variant: "default"})}>
+            <div className={"flex w-full justify-center p-5 gap-5"}>
+                <Link href={"/atividades"} className={buttonVariants({variant: "default"})}>
                     Pendente
                 </Link>
-                <Link href={"?status=COMPLETED"} className={buttonVariants({variant: "default"})}>
+                <Link href="?status=COMPLETED" className={buttonVariants({variant: "default"})}>
                     Completado
                 </Link>
             </div>
-            {filtroAtividades.map((userActivity) => (
-                <div className="m-3 h-32" key={userActivity.activity.id}>
-                    <Card className="flex">
-                        <CardHeader className="flex justify-center w-full">
-                            <CardTitle>{userActivity.activity.title}</CardTitle>
-                            <CardDescription>{userActivity.activity.description}</CardDescription>
-                        </CardHeader>
-                        <CardFooter className="flex justify-center text-center items-center">
-                            <form action={async ()=>{
-                                'use server'
-                                deleteActivity(userActivity.activity.id)}}>
-                                <Button type={"submit"}>Concluir</Button>
-                            </form>
-                        </CardFooter>
-                    </Card>
-                </div>
-            ))}
+            <div className={"border m-5 rounded"}>
+                {status && status === "COMPLETED"
+                    ? atividadesCompletadas.map((userActivity, index) => (
+                        <div className="m-3" key={index}>
+                            <Card className="flex">
+                                <CardHeader className="flex justify-center w-full">
+                                    <CardTitle>{userActivity.activity.title}</CardTitle>
+                                    <CardDescription className={"text-ellipsis line-clamp-2 max-h"}>{userActivity.activity.description}</CardDescription>
+                                </CardHeader>
+                            </Card>
+                        </div>
+                    ))
+                    : atividadesPendentes
+                        .filter(activity => !atividadesCompletedasFiltro.includes(activity.id))
+                        .map((activity, index) => (
+                            <div className="m-3" key={index}>
+                                <Card className="flex">
+                                    <CardHeader className="flex justify-center w-full">
+                                        <CardTitle>{activity.title}</CardTitle>
+                                        <CardDescription className={"line-clamp-3"}>{activity.description}</CardDescription>
+                                    </CardHeader>
+                                    <CardFooter className="flex justify-center text-center items-center">
+                                        <form
+                                            action={async () => {
+                                                'use server';
+                                                await deleteActivity(activity.id);
+                                            }}
+                                        >
+                                            <Button type="submit">Concluir</Button>
+                                        </form>
+                                    </CardFooter>
+                                </Card>
+                            </div>
+                        ))}
+            </div>
         </main>
     );
+
 }

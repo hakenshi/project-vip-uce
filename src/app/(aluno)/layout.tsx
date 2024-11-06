@@ -9,14 +9,16 @@ export default function AlunoLayout({ children }: { children: ReactNode }) {
 
     const user = auth();
 
+    const links = user.classId ? [{link: '/turma', label: 'Minha Turma', icon: faChalkboard}, {
+        link: '/atividades',
+        label: 'Minhas Atividades',
+        icon: faUserGroup
+    }] : [{link: '/turma', label: 'Minha Turma', icon: faChalkboard}]
+
     return(
         <>
             <Nav user={user}/>
-            <Aside links={[{link: '/turma', label: 'Minha Turma', icon: faChalkboard}, {
-                link: '/atividades',
-                label: 'Minhas Atividades',
-                icon: faUserGroup
-            }]}/>
+            <Aside links={links}/>
             {children}
         </>
     )
