@@ -62,13 +62,13 @@ export const createUser = async (form: FormData) => {
     }
 }
 
-export async function updateUser(form: FormData) {
+export async function updateUser(form: FormData, email: string) {
 
     const image = form.get('image') as File;
 
     const user = await db.users.findFirstOrThrow({
         where:{
-            email: form.get('email') as string
+            email
         }
     })
 

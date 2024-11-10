@@ -1,5 +1,6 @@
 import db from "../../../../prisma/db";
 import {NextRequest, NextResponse} from "next/server";
+import {revalidatePath} from "next/cache";
 
 export async function GET() {
 
@@ -30,6 +31,6 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({
-        "message": "debugging"
+        "message": "Success"
     })
 }

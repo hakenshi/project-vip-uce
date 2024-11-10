@@ -119,7 +119,7 @@ export const columns: ColumnDef<Users>[] = [
                         <DialogHeader>
                             <DialogTitle>Editar Aluno</DialogTitle>
                         </DialogHeader>
-                            <EditarAluno user={user} />
+                            <EditarAluno user={user}/>
                         </DialogContent>
                     </Dialog>
                     <AlertDialog open={isAlertOpen} onOpenChange={() => setIsAlertOpen(false)} >

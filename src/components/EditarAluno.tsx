@@ -3,7 +3,6 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import React from "react";
-import {Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {createUser, updateUser} from "@/actions/user-crud";
 import {useToast} from "@/hooks/use-toast";
 import {UserEditSchema, UserSchema, UserValidation} from "@/lib/validation";
@@ -25,7 +24,6 @@ type UserProps = {
 export default function EditarAluno({user}: UserProps) {
 
     const {toast} = useToast()
-
     const editarAluno = async (form: FormData) => {
 
         const newUser = {
@@ -57,7 +55,7 @@ export default function EditarAluno({user}: UserProps) {
             return
         }
 
-        const response = await updateUser(form)
+        const response = await updateUser(form, user.email)
 
         if (response?.message && response?.status == 201) {
             toast({
