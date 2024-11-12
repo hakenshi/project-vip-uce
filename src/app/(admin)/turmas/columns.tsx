@@ -32,6 +32,7 @@ import db from "../../../../prisma/db";
 import {revalidatePath} from "next/cache";
 import {deleteActivity} from "@/actions/activies";
 import ActivitiesForm from "@/app/(admin)/turmas/ActivitiesForm";
+import storeClassmate from "@/actions/classes";
 
 
 export const columns: ColumnDef<Users>[] = [
@@ -298,25 +299,9 @@ export const userColumns: ColumnDef<Users>[] = [
             const selectCount = table.getSelectedRowModel().rows.length
             const users = table.getSelectedRowModel().rows.map(row => row.original.id)
             const classId = table.options.meta?.classId
-            const handleSubmit = () => {
-                fetch(`/api/turmas`, {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({users, classId})
-                })
-            }
 
             return (
-                selectCount > 0 && (<Button onClick={() => handleSubmit()}>Adicionar Alunos ({selectCount})</Button>)
-            )
-        },
-        cell: ({table}) => {
-            const selectedLength = table.getSelectedRowModel().rows.length
-            const classId = table.options.meta?.classId
-            return (
-                selectedLength == 0 && (<Button>Adicionar Aluno</Button>)
+                selectCount > 0 && (<form action={ ()=>storeClassmate(users, classId)}><Button type={"submit"}>Adicionar Alunos ({selectCount})</Button></form>)
             )
         }
     }

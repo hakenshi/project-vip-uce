@@ -15,6 +15,7 @@ import {io} from "socket.io-client";
 import Link from "next/link";
 import {socket} from "../../express/socket.io";
 import {Notifications} from "@prisma/client";
+import {response} from "express";
 
 export default function Notificacao({classId}: { classId: number }) {
     const [notificacoes, setNotificacoes] = useState<string[] | []>([])
@@ -23,34 +24,20 @@ export default function Notificacao({classId}: { classId: number }) {
         socket.on(`turma-${classId}`, async ({notification}) => {
             const response = await fetch(`http://localhost:8000/turma/notificao/${classId}`)
             const data: Notifications = await response.json()
-
-            if (notification) {
-                const getMessage = (message: "MESSAGE" | "ALERT") => {
-                    const messageTypes = {
-                        "MESSAGE": "Você tem uma nova atividade",
-
-                        "ALERT": "Você tem uma atividade pendente."
-                    }
-                    const notificationMessage = messageTypes[message]
-                    if (!notificationMessage) {
-                        alert("Tipo de mensagem inexistente")
-                        return
-                    }
-
-                    return {notificationType: messageTypes, notificationMessage}
-                }
-
-                const newMessage = getMessage(data.notificationType)?.notificationMessage;
-                if (newMessage) {
-                    setNotificacoes((n) => [...n, newMessage])
-                }
-            }
+            console.log(notification)
         })
 
-        return () => {
-            socket.off(`turma-${classId}`)
-        }
+        // fetch(`http://localhost:8000/turma/notificao/${classId}`).then(response=>{
+        //     if(response.ok){
+        //         return response.json()
+        //     }
+        // }).then(data=>{
+        //     console.log(data)
+        // })
+
     }, [notificacoes])
+
+    console.log(notificacoes)
 
     const limparNotificacao = () => {
         setNotificacoes([])

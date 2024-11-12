@@ -19,9 +19,10 @@ app.use(express.urlencoded({extended: true}));
 app.get('/turma/notificao/:id', async (request: Request, response: Response) => {
     try {
         const {id} = request.params
+        console.log(id)
         response.status(200).json(await db.notifications.findMany({
             where: {
-                id: parseInt(id)
+                classId: parseInt(id)
             }
         }))
     } catch (error) {
@@ -142,9 +143,9 @@ io.on('connection', (socket) => {
             })
 
             io.to(`turma-${atividade.classId}`).emit(`turma-${atividade.classId}`, {
-                notification: `${notification.notificationType}`
+                notification: `${notification.notificationType}`,
             });
-            console.log(`Notificação enviada para a turma ${atividade.classId}`)
+            console.log(`Notificação enviada para a turma ${atividade.classId}, ${notification.notificationType}`)
         } catch (error) {
             console.error('Erro ao processar nova atividade:', error);
         }

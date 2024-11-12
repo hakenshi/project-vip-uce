@@ -9,7 +9,7 @@ export default function selectTurmas(){
 
     useEffect(() => {
         const fetchTurmas = async () => {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_API}turmas`,{
+           const response = await fetch('http://localhost:3000/api/turmas',{
                method: "GET",
            });
            if (response.ok){
